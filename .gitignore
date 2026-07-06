@@ -1,0 +1,15 @@
+# Secrets — never commit API keys or passwords
+opencode.jsonc
+.opencode-secrets
+
+# OS junk
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# Editor artifacts
+.venv/
+__pycache__/
+node_modules/

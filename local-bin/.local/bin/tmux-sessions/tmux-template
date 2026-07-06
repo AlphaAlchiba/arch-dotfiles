@@ -1,0 +1,68 @@
+#!/usr/bin/env bash
+
+SESSION="tmux-template"
+ROOT="$HOME/projects/tmux-template"
+
+# Detect terminal size so we can set window dimensions BEFORE splitting.
+# This prevents tmux from distributing the attach-resize delta evenly,
+# which would destroy -l percentage proportions.
+COLS=$(tput cols)
+ROWS=$(tput lines)
+
+tmux has-session -t "$SESSION" 2>/dev/null
+
+if [ $? != 0 ]; then
+  # ── Window: backend ────────────────────────────────────────────────
+  tmux new-session -d -s "$SESSION" -n "backend" -c "$ROOT/backend"
+  tmux resize-window -t "$SESSION:backend" -x "$COLS" -y "$ROWS"
+  tmux send-keys -t "$SESSION:backend.1" "nvim" C-m
+  tmux split-window -h -l 30% -t "$SESSION:backend" -c "$ROOT/backend"
+  tmux send-keys -t "$SESSION:backend.2" "opencode" C-m
+  tmux split-window -v -l 20% -t "$SESSION:backend.1" -c "$ROOT/backend"
+  tmux select-pane -t "$SESSION:backend.1"
+
+  # ── Window: dbt ────────────────────────────────────────────────────
+  tmux new-window -t "$SESSION" -n "dbt" -c "$ROOT/dbt"
+  tmux resize-window -t "$SESSION:dbt" -x "$COLS" -y "$ROWS"
+  tmux send-keys -t "$SESSION:dbt.1" "nvim" C-m
+  tmux split-window -h -l 30% -t "$SESSION:dbt" -c "$ROOT/dbt"
+  tmux send-keys -t "$SESSION:dbt.2" "opencode" C-m
+  tmux split-window -v -l 20% -t "$SESSION:dbt.1" -c "$ROOT/dbt"
+  tmux select-pane -t "$SESSION:dbt.1"
+
+  # ── Window: frontend ───────────────────────────────────────────────
+  tmux new-window -t "$SESSION" -n "frontend" -c "$ROOT/frontend"
+  tmux resize-window -t "$SESSION:frontend" -x "$COLS" -y "$ROWS"
+  tmux send-keys -t "$SESSION:frontend.1" "nvim" C-m
+  tmux split-window -h -l 30% -t "$SESSION:frontend" -c "$ROOT/frontend"
+  tmux send-keys -t "$SESSION:frontend.2" "opencode" C-m
+  tmux split-window -v -l 20% -t "$SESSION:frontend.1" -c "$ROOT/frontend"
+  tmux select-pane -t "$SESSION:frontend.1"
+
+  # ── Window: iac ────────────────────────────────────────────────────
+  tmux new-window -t "$SESSION" -n "iac" -c "$ROOT/iac"
+  tmux resize-window -t "$SESSION:iac" -x "$COLS" -y "$ROWS"
+  tmux send-keys -t "$SESSION:iac.1" "nvim" C-m
+  tmux split-window -h -l 30% -t "$SESSION:iac" -c "$ROOT/iac"
+  tmux send-keys -t "$SESSION:iac.2" "opencode" C-m
+  tmux split-window -v -l 20% -t "$SESSION:iac.1" -c "$ROOT/iac"
+  tmux select-pane -t "$SESSION:iac.1"
+
+  # ── Window: opencode (root level, full screen) ────────────────────
+  tmux new-window -t "$SESSION" -n "opencode" -c "$ROOT"
+  tmux resize-window -t "$SESSION:opencode" -x "$COLS" -y "$ROWS"
+  tmux send-keys -t "$SESSION:opencode.1" "opencode" C-m
+
+  # ── Window: shell (root level, full screen) ───────────────────────
+  tmux new-window -t "$SESSION" -n "shell" -c "$ROOT"
+  tmux resize-window -t "$SESSION:shell" -x "$COLS" -y "$ROWS"
+
+  # ── Move root windows to higher indices for easy keyboard access ──
+  tmux move-window -s "$SESSION:opencode" -t "$SESSION:8"
+  tmux move-window -s "$SESSION:shell"    -t "$SESSION:9"
+
+  # ── Start on the backend window ───────────────────────────────────
+  tmux select-window -t "$SESSION:backend"
+fi
+
+tmux attach -t "$SESSION"

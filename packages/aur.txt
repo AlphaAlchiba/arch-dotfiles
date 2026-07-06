@@ -1,0 +1,10 @@
+auto-cpufreq
+catppuccin-gtk-theme-mocha
+envycontrol
+grimblast-git
+nbfc-linux
+spotify
+tokyonight-gtk-theme-git
+yay-bin
+yay-bin-debug
+zen-browser-bin

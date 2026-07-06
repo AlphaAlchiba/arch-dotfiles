@@ -1,0 +1,22 @@
+{
+  "dashboard-launcher": {
+    "mods": "SUPER",
+    "key": "SPACE"
+  },
+  "dashboard-config": {
+    "mods": "SUPER",
+    "key": "SLASH"
+  },
+  "hotspot-toggle": {
+    "mods": "",
+    "key": ""
+  },
+  "audioMix-toggle": {
+    "mods": "SUPER + SHIFT",
+    "key": "M"
+  },
+  "focus-toggle": {
+    "mods": "SUPER",
+    "key": "PERIOD"
+  }
+}

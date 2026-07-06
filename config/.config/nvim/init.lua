@@ -655,6 +655,13 @@ do
       --  For example, in C this would take you to the header.
       map('grD', vim.lsp.buf.declaration, '[G]oto [D]eclaration')
 
+      -- Hover: press once to open, press twice (KK) to focus & scroll, q to close.
+      --  See `:help vim.lsp.buf.hover()` for details.
+      map('K', vim.lsp.buf.hover, '[H]over documentation')
+
+      -- Show function signature help (also works in insert mode via blink.cmp)
+      map('<C-k>', vim.lsp.buf.signature_help, '[S]ignature [H]elp')
+
       -- The following two autocommands are used to highlight references of the
       -- word under your cursor when your cursor rests there for a little while.
       --    See `:help CursorHold` for information about when this is executed
@@ -700,7 +707,6 @@ do
   ---@type table<string, vim.lsp.Config>
   local servers = {
     clangd = {},
-    gopls = {},
     pyright = {},
     rust_analyzer = {},
 
@@ -759,6 +765,9 @@ do
     },
   }
 
+  -- Only enable gopls if the Go toolchain is installed
+  if vim.fn.executable 'go' == 1 then servers.gopls = {} end
+
   vim.pack.add {
     gh 'neovim/nvim-lspconfig',
     gh 'mason-org/mason.nvim',
@@ -778,11 +787,7 @@ do
   -- You can press `g?` for help in this menu.
   local ensure_installed = vim.tbl_keys(servers or {})
   vim.list_extend(ensure_installed, {
-    -- LSP servers
-    'clangd',
-    'gopls',
-    'pyright',
-    'rust_analyzer',
+    -- LSP servers (keys from `servers` table are already included above)
     'ts_ls',
     -- Formatters
     'biome',         -- JSON, JS, TS, CSS (format + lint)

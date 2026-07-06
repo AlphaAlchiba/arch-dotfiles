@@ -42,6 +42,7 @@ hyprsunset
 imagemagick
 intel-media-driver
 intel-ucode
+jq
 just
 kitty
 lazygit
@@ -76,6 +77,7 @@ pipewire
 pipewire-alsa
 pipewire-jack
 pipewire-pulse
+playerctl
 qemu-desktop
 qt6-5compat
 qt6-base
@@ -83,6 +85,7 @@ qt6ct
 qt6-declarative
 qt6-multimedia
 quickshell
+ripgrep
 rtkit
 satty
 signal-desktop

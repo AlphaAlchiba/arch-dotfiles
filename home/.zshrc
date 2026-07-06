@@ -12,26 +12,6 @@ zstyle ':completion:*' group-name '' # Group results by type
 
 autoload -Uz add-zsh-hook
 
-# Notify when commands take longer than 15 seconds
-__cmd_start_time=0
-__cmd_last=""
-
-__notify_preexec() {
-    __cmd_start_time=$SECONDS
-    __cmd_last="$1"
-}
-
-__notify_precmd() {
-    local elapsed=$((SECONDS - __cmd_start_time))
-    if ((elapsed > 15)) && command -v notify-send >/dev/null 2>&1; then
-        local short_cmd="${__cmd_last:0:80}"
-        notify-send --urgency=low "Command finished (${elapsed}s)" "$short_cmd"
-    fi
-}
-
-add-zsh-hook preexec __notify_preexec
-add-zsh-hook precmd __notify_precmd
-
 # Optimized compinit (only runs once a day or if changed)
 if [[ -n ${ZDOTDIR:-$HOME}/.zcompdump(#qN.m-1) ]]; then
   autoload -Uz compinit && compinit -C

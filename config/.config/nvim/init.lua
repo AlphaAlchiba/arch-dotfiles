@@ -659,8 +659,9 @@ do
       --  See `:help vim.lsp.buf.hover()` for details.
       map('K', vim.lsp.buf.hover, '[H]over documentation')
 
-      -- Show function signature help (also works in insert mode via blink.cmp)
-      map('<C-k>', vim.lsp.buf.signature_help, '[S]ignature [H]elp')
+      -- Show function signature help. gK to open, gK again to focus & scroll, q to close.
+      --  (Keeps Ctrl+K free for tmux navigation.)
+      map('gK', vim.lsp.buf.signature_help, '[S]ignature [H]elp')
 
       -- The following two autocommands are used to highlight references of the
       -- word under your cursor when your cursor rests there for a little while.

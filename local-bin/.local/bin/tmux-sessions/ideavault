@@ -1,0 +1,41 @@
+#!/usr/bin/env bash
+
+SESSION="ideavault"
+ROOT="$HOME/projects/ideavault/"
+
+# Detect terminal size so we can set window dimensions BEFORE splitting.
+# This prevents tmux from distributing the attach-resize delta evenly,
+# which would destroy -l percentage proportions.
+COLS=$(tput cols)
+ROWS=$(tput lines)
+
+tmux has-session -t "$SESSION" 2>/dev/null
+
+if [ $? != 0 ]; then
+  # ── Window: backend ────────────────────────────────────────────────
+  tmux new-session -d -s "$SESSION" -n "django" -c "$ROOT"
+  tmux resize-window -t "$SESSION:django" -x "$COLS" -y "$ROWS"
+  tmux send-keys -t "$SESSION:django.1" "nvim" C-m
+  tmux split-window -h -l 30% -t "$SESSION:django" -c "$ROOT"
+  tmux send-keys -t "$SESSION:django.2" "opencode" C-m
+  tmux split-window -v -l 20% -t "$SESSION:django.1" -c "$ROOT"
+  tmux select-pane -t "$SESSION:django.1"
+
+  # ── Window: opencode (root level, full screen) ────────────────────
+  tmux new-window -t "$SESSION" -n "opencode" -c "$ROOT"
+  tmux resize-window -t "$SESSION:opencode" -x "$COLS" -y "$ROWS"
+  tmux send-keys -t "$SESSION:opencode.1" "opencode" C-m
+
+  # ── Window: shell (root level, full screen) ───────────────────────
+  tmux new-window -t "$SESSION" -n "shell" -c "$ROOT"
+  tmux resize-window -t "$SESSION:shell" -x "$COLS" -y "$ROWS"
+
+  # ── Move root windows to higher indices for easy keyboard access ──
+  tmux move-window -s "$SESSION:opencode" -t "$SESSION:8"
+  tmux move-window -s "$SESSION:shell"    -t "$SESSION:9"
+
+  # ── Start on the backend window ───────────────────────────────────
+  tmux select-window -t "$SESSION:django"
+fi
+
+tmux attach -t "$SESSION"

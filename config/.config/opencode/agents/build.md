@@ -17,6 +17,7 @@ permission:
   git: ask
   webfetch: allow
   websearch: allow
+  brave_*: allow
   todowrite: allow
 ---
 

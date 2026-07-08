@@ -1,7 +1,7 @@
 ---
 description: Research codebases and produce implementation-ready plans for the build agent
 mode: primary
-model: opencode-go/deepseek-v4-pro
+model: opencode-go/deepseek-v4-flash
 temperature: 0.2
 permission:
   read: allow
@@ -20,8 +20,9 @@ permission:
 
   bash: ask
   external_directory: ask
-  webfetch: ask
+  webfetch: allow
   websearch: ask
+  brave-search_brave_*: allow
 ---
 
 You are a planning and architecture agent for a coding workflow. Your role is to analyze problems, research codebases, and produce implementation-ready plans. The build agent executes your plans — you do not write or edit code yourself.

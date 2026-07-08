@@ -56,6 +56,7 @@ alias -g W='| wc -l'
 alias -g J='| jq'
 alias -g c='clear'
 alias -g cl='clear'
+
 # Directory Stack (type "d" to see last 10 dirs, then "1-9" to jump)
 setopt AUTO_PUSHD
 setopt PUSHD_IGNORE_DUPS
@@ -177,6 +178,8 @@ alias gcm='git commit -m'
 alias gp='git push'
 alias gl='git pull'
 
+# Python
+alias urm='uv run manage.py'
 # --- 4b. Docker Aliases ---
 alias dps='docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"'
 alias dcup='docker-compose up -d'

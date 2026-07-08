@@ -1,0 +1,14 @@
+{
+  "dashboard-config": {
+    "mods": "SUPER + SHIFT",
+    "key": "C"
+  },
+  "audioMix-toggle": {
+    "mods": "SUPER + SHIFT",
+    "key": "M"
+  },
+  "focus-toggle": {
+    "mods": "SUPER",
+    "key": "PERIOD"
+  }
+}

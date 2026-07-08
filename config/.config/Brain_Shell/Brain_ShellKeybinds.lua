@@ -24,8 +24,8 @@ end)
 hl.bind("SUPER + D", hl.dsp.exec_cmd("qs ipc -c " .. shell .. " call dashboard-home toggle"))
 hl.bind("CTRL + SHIFT + ESCAPE", hl.dsp.exec_cmd("qs ipc -c " .. shell .. " call dashboard-stats toggle"))
 hl.bind("SUPER + Z", hl.dsp.exec_cmd("qs ipc -c " .. shell .. " call dashboard-kanban toggle"))
-hl.bind("SUPER + SPACE", hl.dsp.exec_cmd("qs ipc -c " .. shell .. " call dashboard-launcher toggle"))
-hl.bind("SUPER + SLASH", hl.dsp.exec_cmd("qs ipc -c " .. shell .. " call dashboard-config toggle"))
+hl.bind("SUPER + Q", hl.dsp.exec_cmd("qs ipc -c " .. shell .. " call dashboard-launcher toggle"))
+hl.bind("SUPER + SHIFT + C", hl.dsp.exec_cmd("qs ipc -c " .. shell .. " call dashboard-config toggle"))
 
 -- Popups
 hl.bind("SUPER + ESCAPE", hl.dsp.exec_cmd("qs ipc -c " .. shell .. " call PowerMenu-toggle toggle"))
@@ -37,6 +37,7 @@ hl.bind("SUPER + V", hl.dsp.exec_cmd("qs ipc -c " .. shell .. " call clipboard-t
 hl.bind("SUPER + ALT + W", hl.dsp.exec_cmd("qs ipc -c " .. shell .. " call wifi-toggle toggle"))
 hl.bind("SUPER + ALT + B", hl.dsp.exec_cmd("qs ipc -c " .. shell .. " call bluetooth-toggle toggle"))
 hl.bind("SUPER + ALT + G", hl.dsp.exec_cmd("qs ipc -c " .. shell .. " call vpn-toggle toggle"))
+hl.bind("SUPER + ALT + H", hl.dsp.exec_cmd("qs ipc -c " .. shell .. " call hotspot-toggle toggle"))
 
 -- Audio Tabs
 hl.bind("SUPER + A", hl.dsp.exec_cmd("qs ipc -c " .. shell .. " call audioOut-toggle toggle"))

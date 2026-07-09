@@ -101,6 +101,9 @@ do
   -- Set to true if you have a Nerd Font installed and selected in the terminal
   vim.g.have_nerd_font = true
 
+  -- Disable netrw (use mini.files + yazi for file browsing instead)
+  vim.g.loaded_netrwPlugin = 1
+
   -- [[ Setting options ]]
   --  See `:help vim.o`
   -- NOTE: You can change these options as you wish!
@@ -708,7 +711,7 @@ do
   ---@type table<string, vim.lsp.Config>
   local servers = {
     clangd = {},
-    pyright = {},
+    -- pyright = {},  -- disabled: using ty (astral) instead
     rust_analyzer = {},
 
     ruff = {
@@ -809,6 +812,9 @@ do
     vim.lsp.config(name, server)
     vim.lsp.enable(name)
   end
+
+  -- Astral ty: Python LSP (install via `uv tool install ty`)
+  vim.lsp.enable('ty')
 end
 
 -- ============================================================
@@ -1043,7 +1049,7 @@ do
   require 'kickstart.plugins.indent_line'
   require 'kickstart.plugins.lint'
   require 'kickstart.plugins.autopairs'
-  require 'kickstart.plugins.neo-tree'
+  -- require 'kickstart.plugins.neo-tree' -- disabled: use mini.files + yazi instead
   require 'kickstart.plugins.gitsigns' -- adds gitsigns recommended keymaps
 
   -- NOTE: You can add your own plugins, configuration, etc from `lua/custom/plugins/*.lua`

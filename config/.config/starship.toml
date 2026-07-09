@@ -1,0 +1,133 @@
+# Global Settings
+command_timeout = 5000
+scan_timeout = 10000
+add_newline = true
+
+# Main layout
+format = """
+${custom.windows}\
+$directory\
+$sudo\
+$git_branch\
+$git_status\
+$status\
+$fill\
+$python\
+$nodejs\
+$rust\
+$golang\
+$aws\
+${custom.gcp_project}\
+${custom.gcp_identity}\
+$docker_context\
+$jobs\
+$cmd_duration\
+$line_break\
+$character"""
+
+# Custom Windows Indicator
+[custom.windows]
+when = 'pwd | grep -q "^/mnt/c"'
+command = "echo ' '"
+style = "bold #0078d4" # Windows Blue
+format = "[$output ]($style)" # Added space after icon
+
+[fill]
+symbol = " "
+
+[directory]
+style = "bold #7aa2f7" # Tokyo Night Blue
+format = "[$path]($style)"
+truncation_length = 2
+truncation_symbol = "../"
+home_symbol = "~"
+read_only = " 󰌾"
+use_os_path_sep = true
+truncate_to_repo = false
+
+[git_branch]
+style = "bold #bb9af7" # Tokyo Night Magenta
+symbol = " "
+format = " [on](white) [$symbol$branch]($style)"
+
+[git_status]
+style = "bold #f7768e" # Tokyo Night Red
+format = " ([$all_status$ahead_behind]($style))"
+conflicted = "="
+ahead = "⇡"
+behind = "⇣"
+diverged = "⇕"
+untracked = "?"
+stashed = "$"
+modified = "!"
+staged = "+"
+renamed = "»"
+deleted = "✘"
+
+[character]
+success_symbol = "[➜](bold #9ece6a)" # Tokyo Night Green
+error_symbol = "[✗](bold #f7768e)"   # Tokyo Night Red
+
+[sudo]
+disabled = false
+symbol = "󰌾 "
+format = " [$symbol]($style)"
+style = "bold #ff9e64" # Tokyo Night Orange
+
+[jobs]
+symbol = "✦"
+format = " [$symbol$number]($style)"
+style = "bold #e0af68" # Tokyo Night Yellow
+
+[status]
+disabled = false
+format = " [$symbol $common_meaning$signal_name$maybe_int]($style)"
+symbol = "✘"
+style = "bold #f7768e"
+
+[cmd_duration]
+min_time = 500
+format = " took [$duration]($style) " # Added leading space
+style = "#e0af68"
+
+[python]
+style = 'dimmed #94e2d5'
+symbol = ' '
+format = '[${symbol}${pyenv_prefix}(${version} )(\($virtualenv\) )]($style)'
+#pyenv_version_name = true
+pyenv_prefix = ''
+
+[nodejs]
+style = "#9ece6a"
+symbol = " "
+
+[rust]
+style = "#ff9e64"
+symbol = " "
+
+[golang]
+style = "#7dcfff"
+symbol = " "
+
+[aws]
+style = "#ff9e64"
+symbol = "  "
+
+[gcloud]
+disabled = true
+
+[custom.gcp_project]
+command = 'CFG_NAME=$(cat ~/.config/gcloud/active_config 2>/dev/null); [ -n "$CFG_NAME" ] && grep "^project =" ~/.config/gcloud/configurations/config_$CFG_NAME | cut -d" " -f3'
+when = "test -f ~/.config/gcloud/active_config"
+style = "bold #7aa2f7"
+format = " [on](white) [󱇶 $output]($style)"
+
+[custom.gcp_identity]
+command = 'CFG_NAME=$(cat ~/.config/gcloud/active_config 2>/dev/null); [ -z "$CFG_NAME" ] && exit 1; CFG=~/.config/gcloud/configurations/config_$CFG_NAME; IMP=$(grep "^impersonate_service_account =" $CFG | cut -d" " -f3); if [ -n "$IMP" ]; then echo "$IMP" | cut -d"@" -f1; else grep "^account =" $CFG | cut -d" " -f3 | cut -d"@" -f1; fi'
+when = "test -f ~/.config/gcloud/active_config"
+style = "bold #bb9af7"
+format = " [as](white) [$output]($style)"
+
+[docker_context]
+style = "#7aa2f7"
+symbol = " "

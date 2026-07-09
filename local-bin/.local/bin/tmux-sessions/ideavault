@@ -12,29 +12,32 @@ ROWS=$(tput lines)
 tmux has-session -t "$SESSION" 2>/dev/null
 
 if [ $? != 0 ]; then
-  # ── Window: backend ────────────────────────────────────────────────
+  # ── Window: django ─────────────────────────────────────────
   tmux new-session -d -s "$SESSION" -n "django" -c "$ROOT"
   tmux resize-window -t "$SESSION:django" -x "$COLS" -y "$ROWS"
   tmux send-keys -t "$SESSION:django.1" "nvim" C-m
+  sleep 0.1   # let nvim finish startup before split
   tmux split-window -h -l 30% -t "$SESSION:django" -c "$ROOT"
   tmux send-keys -t "$SESSION:django.2" "opencode" C-m
+  sleep 0.3   # let opencode settle before next split
   tmux split-window -v -l 20% -t "$SESSION:django.1" -c "$ROOT"
+  sleep 1   # let terminal settle before select-pane triggers focus event
   tmux select-pane -t "$SESSION:django.1"
 
-  # ── Window: opencode (root level, full screen) ────────────────────
+  # ── Window: opencode ───────────────────────────────────────
   tmux new-window -t "$SESSION" -n "opencode" -c "$ROOT"
   tmux resize-window -t "$SESSION:opencode" -x "$COLS" -y "$ROWS"
   tmux send-keys -t "$SESSION:opencode.1" "opencode" C-m
 
-  # ── Window: shell (root level, full screen) ───────────────────────
+  # ── Window: shell ───────────────────────────────────────────
   tmux new-window -t "$SESSION" -n "shell" -c "$ROOT"
   tmux resize-window -t "$SESSION:shell" -x "$COLS" -y "$ROWS"
 
-  # ── Move root windows to higher indices for easy keyboard access ──
+  # ── Move root windows to higher indices ─────────────────────
   tmux move-window -s "$SESSION:opencode" -t "$SESSION:8"
   tmux move-window -s "$SESSION:shell"    -t "$SESSION:9"
 
-  # ── Start on the backend window ───────────────────────────────────
+  # ── Start on the django window ─────────────────────────────
   tmux select-window -t "$SESSION:django"
 fi
 

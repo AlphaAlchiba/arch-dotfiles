@@ -133,6 +133,14 @@ do
   -- Enable undo/redo changes even after closing and reopening a file
   vim.o.undofile = true
 
+  -- Disable swap files (avoids E325 warnings when editing the same file in multiple terminals).
+  -- undofile provides crash recovery instead.
+  vim.o.swapfile = false
+
+  -- Allow modified buffers to be hidden without saving first (avoids E37/E95 errors
+  -- when switching away from a dirty buffer). Combined with undofile, no data loss risk.
+  vim.o.hidden = true
+
   -- Case-insensitive searching UNLESS \C or one or more capital letters in the search term
   vim.o.ignorecase = true
   vim.o.smartcase = true
@@ -376,7 +384,7 @@ do
     -- Document existing key chains
     spec = {
       { '<leader>s', group = '[S]earch', mode = { 'n', 'v' } },
-      { '<leader>t', group = '[T]oggle' },
+      { '<leader>t', group = '[T]oggle / [T]est' },
       { '<leader>h', group = 'Git [H]unk', mode = { 'n', 'v' } }, -- Enable gitsigns recommended keymaps first
       { '<leader>g', group = '[G]it', mode = { 'n' } },
       { '<leader>d', group = '[D]atabase / [D]ebug', mode = { 'n' } },
@@ -932,6 +940,7 @@ do
       --
       -- See `:help blink-cmp-config-keymap` for defining your own keymap
       preset = 'default',
+      ['<CR>'] = { 'accept', 'fallback' },
 
       -- For more advanced Luasnip keymaps (e.g. selecting choice nodes, expansion) see:
       --    https://github.com/L3MON4D3/LuaSnip?tab=readme-ov-file#keymaps

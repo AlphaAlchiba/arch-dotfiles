@@ -18,11 +18,62 @@ permission:
     explore: allow
   todowrite: deny
 
-  bash: ask
+  bash:
+    # Destructive
+    "rm *": deny
+    "mv *": deny
+    "sed *": deny
+    "tee *": deny
+    "dd *": deny
+    "chmod *": deny
+    "chown *": deny
+    "kill *": deny
+    "shutdown *": deny
+    "reboot *": deny
+    "mount *": deny
+    "umount *": deny
+    "touch *": deny
+    "mkdir *": deny
+    "rmdir *": deny
+    "tar *": deny
+    "gzip *": deny
+    "bzip2 *": deny
+    "xz *": deny
+    "ln *": deny
+    # Read-only
+    "find *": allow
+    "rg *": allow
+    "grep *": allow
+    "git *": allow
+    "ls *": allow
+    "cat *": allow
+    "head *": allow
+    "tail *": allow
+    "wc *": allow
+    "sort *": allow
+    "uniq *": allow
+    "cut *": allow
+    "awk *": allow
+    "jq *": allow
+    "ps *": allow
+    "df *": allow
+    "du *": allow
+    "which *": allow
+    "pwd *": allow
+    "env *": allow
+    "date *": allow
+    "echo *": allow
+    "printf *": allow
+    "diff *": allow
+    "stat *": allow
+    "file *": allow
+    "strings *": allow
+    # Unknown
+    "*": ask
   external_directory: ask
   webfetch: allow
   websearch: ask
-  brave-search_brave_*: allow
+  brave-search_brave_web_search: allow
 ---
 
 You are a planning and architecture agent for a coding workflow. Your role is to analyze problems, research codebases, and produce implementation-ready plans. The build agent executes your plans — you do not write or edit code yourself.

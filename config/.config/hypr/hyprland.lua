@@ -133,7 +133,7 @@ hl.gesture({
 -- See https://wiki.hypr.land/Configuring/Advanced-and-Cool/Devices/ for more
 hl.config({
 	input = {
-		--kb_options = "caps:swapescape",
+		kb_options = "caps:swapescape",
 	},
 })
 

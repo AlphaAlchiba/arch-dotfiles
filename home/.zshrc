@@ -126,7 +126,7 @@ done
 unset _depth _f1 _f2 _f3
 	
 alias ls='eza --icons --group-directories-first'
-alias ll='eza -lh --icons --grid --group-directories-first --header --git'
+alias ll='eza -lh --icons --group-directories-first --header --git'
 alias la='eza -a --icons --group-directories-first'
 alias lt='eza --tree --level=2 --icons'
 alias cat='bat --paging=never'

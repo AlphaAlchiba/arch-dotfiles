@@ -6,6 +6,9 @@ vim.opt.termguicolors = true
 vim.opt.laststatus = 0
 vim.opt.cmdheight = 0
 
+-- Don't clear vimbridge on FocusLost — keep last nvim status visible when switching panes
+vim.g.tpipeline_focuslost = 0
+
 -- Don't prepend StatusLine bg (let lualine handle its own background)
 vim.g.tpipeline_preservebg = 1
 

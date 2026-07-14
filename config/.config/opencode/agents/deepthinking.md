@@ -17,7 +17,58 @@ permission:
     explore: allow
     vision: allow
     security-auditor: allow
-  bash: ask
+  bash:
+    # Destructive
+    "rm *": deny
+    "mv *": deny
+    "sed *": deny
+    "tee *": deny
+    "dd *": deny
+    "chmod *": deny
+    "chown *": deny
+    "kill *": deny
+    "shutdown *": deny
+    "reboot *": deny
+    "mount *": deny
+    "umount *": deny
+    "touch *": deny
+    "mkdir *": deny
+    "rmdir *": deny
+    "tar *": deny
+    "gzip *": deny
+    "bzip2 *": deny
+    "xz *": deny
+    "ln *": deny
+    # Read-only
+    "find *": allow
+    "rg *": allow
+    "grep *": allow
+    "git *": allow
+    "ls *": allow
+    "cat *": allow
+    "head *": allow
+    "tail *": allow
+    "wc *": allow
+    "sort *": allow
+    "uniq *": allow
+    "cut *": allow
+    "awk *": allow
+    "jq *": allow
+    "ps *": allow
+    "df *": allow
+    "du *": allow
+    "which *": allow
+    "pwd *": allow
+    "env *": allow
+    "date *": allow
+    "echo *": allow
+    "printf *": allow
+    "diff *": allow
+    "stat *": allow
+    "file *": allow
+    "strings *": allow
+    # Unknown
+    "*": ask
   webfetch: ask
 ---
 

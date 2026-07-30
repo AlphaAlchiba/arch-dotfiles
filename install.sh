@@ -59,15 +59,31 @@ log "Linking config files..."
 command -v stow >/dev/null 2>&1 || sudo pacman -S --noconfirm stow
 
 # Remove existing target dirs so stow can create clean symlinks
-for dir in tmux hypr kitty nvim starship fastfetch gtk-3.0 gtk-4.0 lazygit \
-           matugen opencode fish systemd Brain_Shell; do
-    if [ -e "$HOME/.config/$dir" ] && [ ! -L "$HOME/.config/$dir" ]; then
-        rm -rf "$HOME/.config/$dir"
+# (only removes real files/dirs, not existing symlinks — stow handles those)
+for dir in "$DOTFILES"/config/*/; do
+    name=$(basename "$dir")
+    if [ -e "$HOME/.config/$name" ] && [ ! -L "$HOME/.config/$name" ]; then
+        rm -rf "$HOME/.config/$name"
+    fi
+done
+# Also handle any top-level config files (e.g. starship.toml)
+for f in "$DOTFILES"/config/*; do
+    [ -f "$f" ] || continue
+    name=$(basename "$f")
+    if [ -e "$HOME/.config/$name" ] && [ ! -L "$HOME/.config/$name" ]; then
+        rm -f "$HOME/.config/$name"
     fi
 done
 for f in .zshrc .bashrc .profile .gitconfig; do
     if [ -f "$HOME/$f" ] && [ ! -L "$HOME/$f" ]; then
         rm -f "$HOME/$f"
+    fi
+done
+# Clean up ~/.local/bin for local-bin stow package
+for entry in "$DOTFILES"/local-bin/bin/*; do
+    name=$(basename "$entry")
+    if [ -e "$HOME/.local/bin/$name" ] && [ ! -L "$HOME/.local/bin/$name" ]; then
+        rm -rf "$HOME/.local/bin/$name"
     fi
 done
 
@@ -77,8 +93,6 @@ stow -R -d "$DOTFILES" -t "$HOME"          home   2>/dev/null || \
     stow -d "$DOTFILES" -t "$HOME"          home
 stow -R -d "$DOTFILES" -t "$HOME/.local"   local-bin 2>/dev/null || \
     stow -d "$DOTFILES" -t "$HOME/.local"   local-bin
-
-ln -sf "$HOME/.config/tmux/tmux.conf" "$HOME/.tmux.conf"
 
 # ── 4. Clone Brain_Shell ────────────────────────────────────────────────────
 if [ ! -d "$HOME/.local/src/Brain_Shell" ]; then

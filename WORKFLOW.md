@@ -23,7 +23,7 @@
 
 ```
 ~/dotfiles/                          ← git repo (github.com:AlphaAlchiba/dotfiles)
-├── config/.config/                  ← stowed to ~/.config/
+├── config/                  ← stowed to ~/.config/
 │   ├── tmux/tmux.conf
 │   ├── hypr/hyprland.lua + modules/
 │   ├── kitty/kitty.conf
@@ -34,7 +34,7 @@
 │   ├── .gitconfig
 │   ├── .bashrc
 │   └── .profile
-├── local-bin/.local/bin/            ← stowed to ~/.local/bin/
+├── local-bin/bin/            ← stowed to ~/.local/bin/
 │   ├── env
 │   ├── env.fish
 │   └── tmux-sessions/
@@ -52,15 +52,13 @@ GNU Stow creates symlinks from the repo to your home directory. Whole directorie
 
 | Dotfiles path | Live path | Type |
 |---|---|---|
-| `~/dotfiles/config/.config/tmux/` | `~/.config/tmux/` | Whole directory symlink |
-| `~/dotfiles/config/.config/hypr/` | `~/.config/hypr/` | Whole directory symlink |
-| `~/dotfiles/config/.config/nvim/` | `~/.config/nvim/` | Whole directory symlink |
-| `~/dotfiles/config/.config/kitty/` | `~/.config/kitty/` | Whole directory symlink |
+| `~/dotfiles/config/tmux/` | `~/.config/tmux/` | Whole directory symlink |
+| `~/dotfiles/config/hypr/` | `~/.config/hypr/` | Whole directory symlink |
+| `~/dotfiles/config/nvim/` | `~/.config/nvim/` | Whole directory symlink |
+| `~/dotfiles/config/kitty/` | `~/.config/kitty/` | Whole directory symlink |
 | `~/dotfiles/home/.zshrc` | `~/.zshrc` | Single file symlink |
 | `~/dotfiles/home/.gitconfig` | `~/.gitconfig` | Single file symlink |
-| `~/dotfiles/local-bin/.local/bin/` | `~/.local/bin/` | Whole directory symlink |
-
-The only manual symlink is `~/.tmux.conf` → `~/.config/tmux/tmux.conf`, created by `install.sh` or by hand if it breaks.
+| `~/dotfiles/local-bin/bin/` | `~/.local/bin/` | Whole directory symlink |
 
 ---
 
@@ -74,7 +72,7 @@ The file on disk is a symlink, so editing either path edits the dotfiles repo:
 # 1. Edit the file (both paths lead to the same file)
 nvim ~/.config/tmux/tmux.conf
 # OR
-nvim ~/dotfiles/config/.config/tmux/tmux.conf
+nvim ~/dotfiles/config/tmux/tmux.conf
 
 # 2. Test the change
 tmux source-file ~/.config/tmux/tmux.conf
@@ -92,14 +90,14 @@ Create the file in the dotfiles repo — it appears live instantly because the p
 
 ```bash
 # 1. Create the file in the source of truth
-nvim ~/dotfiles/config/.config/tmux/new-plugin.conf
+nvim ~/dotfiles/config/tmux/new-plugin.conf
 
 # 2. It's already live — the symlink propagates immediately
 ls ~/.config/tmux/new-plugin.conf   # exists right away
 
 # 3. Commit and push
 cd ~/dotfiles
-git add config/.config/tmux/new-plugin.conf
+git add config/tmux/new-plugin.conf
 git commit -m "feat(tmux): add new-plugin config"
 git push
 ```
@@ -110,8 +108,8 @@ When you install a new tool and want its config tracked:
 
 ```bash
 # 1. Create the config directory in dotfiles
-mkdir -p ~/dotfiles/config/.config/newapp/
-cp -r ~/.config/newapp/* ~/dotfiles/config/.config/newapp/
+mkdir -p ~/dotfiles/config/newapp/
+cp -r ~/.config/newapp/* ~/dotfiles/config/newapp/
 
 # 2. Remove the real directory (stow needs to replace it with a symlink)
 rm -rf ~/.config/newapp
@@ -121,10 +119,10 @@ cd ~/dotfiles
 stow -R -d . -t ~/.config config
 
 # 4. Verify the symlink
-ls -la ~/.config/newapp      # → ../dotfiles/config/.config/newapp
+ls -la ~/.config/newapp      # → ../dotfiles/config/newapp
 
 # 5. Commit and push
-git add config/.config/newapp/
+git add config/newapp/
 git commit -m "feat(config): add newapp config"
 git push
 ```
@@ -234,7 +232,7 @@ cd ~/dotfiles && stow -R -d . -t ~/.config config   # re-link
 | Path | What it is |
 |---|---|
 | `~/dotfiles/` | Source of truth — the git repo |
-| `~/dotfiles/config/.config/<app>/` | Per-app config (symlinked to `~/.config/<app>/`) |
+| `~/dotfiles/config/<app>/` | Per-app config (symlinked to `~/.config/<app>/`) |
 | `~/dotfiles/home/.zshrc` | Shell config (symlinked to `~/.zshrc`) |
 | `~/dotfiles/packages/official.txt` | Native package list |
 | `~/dotfiles/packages/aur.txt` | AUR package list |
@@ -250,7 +248,7 @@ cd ~/dotfiles && stow -R -d . -t ~/.config config   # re-link
 | Re-link after `git pull` | `cd ~/dotfiles && stow -R -d . -t ~/.config config` |
 | Update package lists | `pacman -Qqen \| sort > ~/dotfiles/packages/official.txt` |
 | Load new secrets into shell | `source ~/.opencode-secrets` |
-| Fix broken `~/.tmux.conf` | `ln -sf ~/.config/tmux/tmux.conf ~/.tmux.conf` |
+| Verify symlink target | `ls -la ~/.config/tmux` (should show `-> ../dotfiles/config/tmux`) |
 | Restore on new machine | `git clone git@github.com:AlphaAlchiba/dotfiles.git ~/dotfiles && cd ~/dotfiles && ./install.sh` |
 
 ---

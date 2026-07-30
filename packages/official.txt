@@ -40,8 +40,6 @@ hyprshot
 hyprshutdown
 hyprsunset
 imagemagick
-intel-media-driver
-intel-ucode
 jq
 just
 kitty
@@ -66,7 +64,6 @@ noto-fonts
 noto-fonts-cjk
 noto-fonts-emoji
 npm
-nvidia-open-dkms
 nwg-look
 obsidian
 openssh

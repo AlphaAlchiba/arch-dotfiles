@@ -1,5 +1,5 @@
 # Secrets — never commit API keys or passwords
-opencode.jsonc
+# opencode.jsonc is committed; API keys are referenced via {env:...} placeholders.
 .opencode-secrets
 
 # OS junk

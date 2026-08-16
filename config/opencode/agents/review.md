@@ -5,18 +5,11 @@ model: opencode-go/deepseek-v4-flash
 temperature: 0.1
 steps: 8
 permission:
-  read: allow
-  list: allow
-  grep: allow
-  glob: allow
-  lsp: allow
   edit: deny
   write: deny
   bash: deny
   task: deny
-  git: deny
   webfetch: allow
-  websearch: allow
 ---
 
 You are a code review agent. You analyze staged and unstaged changes for quality issues, bugs, and best practices. You do not make any edits.

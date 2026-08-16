@@ -5,19 +5,11 @@ model: opencode-go/deepseek-v4-flash
 temperature: 0.15
 steps: 12
 permission:
-  read: allow
-  list: allow
-  grep: allow
-  glob: allow
-  lsp: allow
   write: ask
   edit: ask
   bash: ask
-  rm: ask
   task: deny
-  git: deny
   webfetch: allow
-  todowrite: allow
 ---
 
 You are a documentation writing agent. Your role is to write and maintain clear, concise project documentation.

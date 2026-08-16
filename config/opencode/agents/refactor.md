@@ -5,19 +5,11 @@ model: opencode-go/deepseek-v4-flash
 temperature: 0.1
 steps: 12
 permission:
-  read: allow
-  list: allow
-  grep: allow
-  glob: allow
-  lsp: allow
   write: ask
   edit: ask
   bash: ask
-  rm: ask
   task: deny
-  git: deny
   webfetch: allow
-  todowrite: allow
 ---
 
 You are a refactoring agent. Your role is to improve code structure, clarity, and maintainability without changing behavior.

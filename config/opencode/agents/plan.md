@@ -4,11 +4,6 @@ mode: primary
 model: opencode-go/deepseek-v4-flash
 temperature: 0.2
 permission:
-  read: allow
-  list: allow
-  grep: allow
-  glob: allow
-  lsp: allow
   write: deny
   edit: deny
   task:
@@ -19,6 +14,8 @@ permission:
   todowrite: deny
 
   bash:
+    # Catch-all first; last matching rule wins
+    "*": ask
     # Destructive
     "rm *": deny
     "mv *": deny
@@ -44,7 +41,37 @@ permission:
     "find *": allow
     "rg *": allow
     "grep *": allow
-    "git *": allow
+    # Git: read-only only — mutations denied, never prompted
+    "git *": deny
+    "git status*": allow
+    "git diff*": allow
+    "git log*": allow
+    "git show*": allow
+    "git rev-parse*": allow
+    "git ls-files*": allow
+    "git ls-tree*": allow
+    "git grep*": allow
+    "git blame*": allow
+    "git branch": allow
+    "git branch -a*": allow
+    "git branch -r*": allow
+    "git branch -v*": allow
+    "git branch -l*": allow
+    "git branch --list*": allow
+    "git branch --merged*": allow
+    "git branch --no-merged*": allow
+    "git branch --contains*": allow
+    "git branch --show-current*": allow
+    "git remote*": allow
+    "git remote add*": deny
+    "git remote remove*": deny
+    "git remote set-url*": deny
+    "git remote rename*": deny
+    "git remote update*": deny
+    "git tag": allow
+    "git tag -l*": allow
+    "git tag --list*": allow
+    "git tag -n*": allow
     "ls *": allow
     "cat *": allow
     "head *": allow
@@ -68,11 +95,8 @@ permission:
     "stat *": allow
     "file *": allow
     "strings *": allow
-    # Unknown
-    "*": ask
   external_directory: ask
   webfetch: allow
-  websearch: ask
   brave-search_brave_web_search: allow
 ---
 

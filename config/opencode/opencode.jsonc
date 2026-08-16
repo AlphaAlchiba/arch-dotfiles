@@ -1,0 +1,120 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "permission": {
+    "bash": "ask",
+    "edit": "ask",
+    "websearch": "deny"
+  },
+  "autoupdate": true,
+  "instructions": ["instructions/*.md"],
+  "default_agent": "plan",
+  "agent": {
+    "explore": {
+      "permission": {
+        "bash": {
+          // last matching rule wins: catch-all first, specific rules after
+          "*": "ask",
+          "rm *": "deny",
+          "mv *": "deny",
+          "sed *": "deny",
+          "tee *": "deny",
+          "dd *": "deny",
+          "chmod *": "deny",
+          "chown *": "deny",
+          "kill *": "deny",
+          "shutdown *": "deny",
+          "reboot *": "deny",
+          "mount *": "deny",
+          "umount *": "deny",
+          "touch *": "deny",
+          "mkdir *": "deny",
+          "rmdir *": "deny",
+          "tar *": "deny",
+          "gzip *": "deny",
+          "bzip2 *": "deny",
+          "xz *": "deny",
+          "ln *": "deny",
+          "find *": "allow",
+          "rg *": "allow",
+          "grep *": "allow",
+          // Git: read-only only — mutations denied, never prompted
+          "git *": "deny",
+          "git status*": "allow",
+          "git diff*": "allow",
+          "git log*": "allow",
+          "git show*": "allow",
+          "git rev-parse*": "allow",
+          "git ls-files*": "allow",
+          "git ls-tree*": "allow",
+          "git grep*": "allow",
+          "git blame*": "allow",
+          "git branch": "allow",
+          "git branch -a*": "allow",
+          "git branch -r*": "allow",
+          "git branch -v*": "allow",
+          "git branch -l*": "allow",
+          "git branch --list*": "allow",
+          "git branch --merged*": "allow",
+          "git branch --no-merged*": "allow",
+          "git branch --contains*": "allow",
+          "git branch --show-current*": "allow",
+          "git remote*": "allow",
+          "git remote add*": "deny",
+          "git remote remove*": "deny",
+          "git remote set-url*": "deny",
+          "git remote rename*": "deny",
+          "git remote update*": "deny",
+          "git tag": "allow",
+          "git tag -l*": "allow",
+          "git tag --list*": "allow",
+          "git tag -n*": "allow",
+          "ls *": "allow",
+          "cat *": "allow",
+          "head *": "allow",
+          "tail *": "allow",
+          "wc *": "allow",
+          "sort *": "allow",
+          "uniq *": "allow",
+          "cut *": "allow",
+          "awk *": "allow",
+          "jq *": "allow",
+          "ps *": "allow",
+          "df *": "allow",
+          "du *": "allow",
+          "which *": "allow",
+          "pwd *": "allow",
+          "env *": "allow",
+          "date *": "allow",
+          "echo *": "allow",
+          "printf *": "allow",
+          "diff *": "allow",
+          "stat *": "allow",
+          "file *": "allow",
+          "strings *": "allow"
+        }
+      }
+    }
+  },
+  "small_model": "opencode-go/deepseek-v4-flash",
+  "compaction": { "auto": true, "tail_turns": 15 },
+  "mcp": {
+    "context7": {
+      "type": "remote",
+      "url": "https://mcp.context7.com/mcp",
+      "headers": {
+        "CONTEXT7_API_KEY": "{env:CONTEXT7_API_KEY}"
+      },
+      "enabled": true
+    },
+    "brave-search": {
+      "type": "local",
+      "command": ["npx", "-y", "@brave/brave-search-mcp-server"],
+      "enabled": true,
+      "environment": {
+        "BRAVE_API_KEY": "{env:BRAVE_API_KEY}",
+        "BRAVE_MCP_ENABLED_TOOLS": "brave_web_search"
+      }
+    }
+  },
+  "formatter": true
+}

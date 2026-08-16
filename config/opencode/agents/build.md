@@ -4,21 +4,14 @@ mode: primary
 model: opencode-go/deepseek-v4-flash
 temperature: 0.1
 permission:
-  read: allow
-  list: allow
-  grep: allow
-  glob: allow
-  lsp: allow
   write: ask
   edit: ask
   task: ask
-  bash: ask
-  rm: ask
-  git: ask
+  bash:
+    # Always ask for git operations (and everything else)
+    "*": ask
+    "git *": ask
   webfetch: allow
-  websearch: allow
-  brave_*: allow
-  todowrite: allow
 ---
 
 You are an implementation agent. Your role is to implement plans from the plan agent and fix issues by writing code, creating tests, and managing git workflow.

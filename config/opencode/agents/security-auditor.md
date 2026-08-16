@@ -5,16 +5,10 @@ model: opencode-go/deepseek-v4-pro
 temperature: 0.1
 steps: 8
 permission:
-  read: allow
-  list: allow
-  grep: allow
-  glob: allow
-  lsp: allow
   write: deny
   edit: deny
   bash: deny
   task: deny
-  git: deny
   webfetch: allow
 ---
 

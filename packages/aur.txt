@@ -1,6 +1,8 @@
 auto-cpufreq
 catppuccin-gtk-theme-mocha
+dankcalendar-bin
 grimblast-git
+localsend-bin
 spotify
 tokyonight-gtk-theme-git
 yay-bin

@@ -35,11 +35,11 @@ hl.config({
 		blur = {
 			enabled = true,
 			special = true,
-			size = 2,
+			size = 4,
 			passes = 2,
 			vibrancy = 0.25,
 		},
-		dim_special = 0.6,
+		dim_special = 0.4,
 	},
 
 	animations = {

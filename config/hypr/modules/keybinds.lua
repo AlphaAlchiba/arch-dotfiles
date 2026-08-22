@@ -65,10 +65,11 @@ hl.window_rule({
 hl.bind(mainMod .. " + O", hl.dsp.workspace.toggle_special("obsidian"))
 hl.workspace_rule({ workspace = "special:obsidian", on_created_empty = "obsidian" })
 hl.window_rule({
-	match = { class = "obsidian" },
+	match = { class = "md.obsidian.Obsidian" },
 	float = true,
 	center = true,
 	size = { "(monitor_w*0.9)", "(monitor_h*0.9)" },
+	opacity = "0.9",
 })
 
 -- hl.layer_rule({ match = { namespace = "quickshell" }, blur = true })
@@ -76,7 +77,12 @@ hl.window_rule({
 -- signal special workspace
 hl.bind(mainMod .. " + I", hl.dsp.workspace.toggle_special("signal"))
 hl.workspace_rule({ workspace = "special:signal", on_created_empty = "signal-desktop" })
-hl.window_rule({ match = { class = "signal" }, float = true, size = { "(monitor_w*0.6)", "(monitor_h*0.6)" } })
+hl.window_rule({
+	match = { class = "signal" },
+	float = true,
+	size = { "(monitor_w*0.6)", "(monitor_h*0.6)" },
+	opacity = "0.9",
+})
 
 -- Dank Cal (dcal) special workspace
 hl.bind(mainMod .. " + T", hl.dsp.workspace.toggle_special("dankcal"))
@@ -86,6 +92,7 @@ hl.window_rule({
 	float = true,
 	size = { "(monitor_w*0.85)", "(monitor_h*0.85)" },
 	center = true,
+	opacity = "0.9",
 })
 -- "New event" popup in dank calendar
 hl.window_rule({
@@ -96,6 +103,7 @@ hl.window_rule({
 	float = true,
 	size = { "(monitor_w*0.55)", "(monitor_h*0.65)" },
 	center = true,
+	opacity = "0.9",
 })
 
 -- LocalSend special workspace
@@ -106,6 +114,7 @@ hl.window_rule({
 	float = true,
 	size = { "(monitor_w*0.25)", "(monitor_h*0.65)" },
 	center = true,
+	opacity = "0.9",
 })
 
 -- Scroll through existing workspaces with mainMod + scroll

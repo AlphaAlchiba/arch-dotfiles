@@ -141,6 +141,10 @@ do
   -- when switching away from a dirty buffer). Combined with undofile, no data loss risk.
   vim.o.hidden = true
 
+  -- Auto-reload files changed on disk (e.g. by opencode in another tmux pane).
+  -- checktime (see autocmd below) skips buffers with unsaved local changes.
+  vim.o.autoread = true
+
   -- Case-insensitive searching UNLESS \C or one or more capital letters in the search term
   vim.o.ignorecase = true
   vim.o.smartcase = true
@@ -262,6 +266,16 @@ do
     desc = 'Highlight when yanking (copying) text',
     group = vim.api.nvim_create_augroup('kickstart-highlight-yank', { clear = true }),
     callback = function() vim.hl.on_yank() end,
+  })
+
+  -- Reload buffers when files change on disk (e.g. opencode editing in another pane).
+  -- checktime only reloads buffers without unsaved local changes, so no data loss risk.
+  vim.api.nvim_create_autocmd({ 'FocusGained', 'BufEnter', 'CursorHold', 'CursorHoldI' }, {
+    desc = 'Check for file changes on disk',
+    group = vim.api.nvim_create_augroup('kickstart-checktime', { clear = true }),
+    callback = function()
+      vim.cmd.checktime()
+    end,
   })
 end
 

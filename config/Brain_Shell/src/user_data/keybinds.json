@@ -1,4 +1,8 @@
 {
+  "dashboard-launcher": {
+    "mods": "SUPER",
+    "key": "SPACE"
+  },
   "dashboard-config": {
     "mods": "SUPER + SHIFT",
     "key": "C"

@@ -78,6 +78,36 @@ hl.bind(mainMod .. " + I", hl.dsp.workspace.toggle_special("signal"))
 hl.workspace_rule({ workspace = "special:signal", on_created_empty = "signal-desktop" })
 hl.window_rule({ match = { class = "signal" }, float = true, size = { "(monitor_w*0.6)", "(monitor_h*0.6)" } })
 
+-- Dank Cal (dcal) special workspace
+hl.bind(mainMod .. " + T", hl.dsp.workspace.toggle_special("dankcal"))
+hl.workspace_rule({ workspace = "special:dankcal", on_created_empty = "dcal" })
+hl.window_rule({
+	match = { class = "com.danklinux.dankcalendar" },
+	float = true,
+	size = { "(monitor_w*0.85)", "(monitor_h*0.85)" },
+	center = true,
+})
+-- "New event" popup in dank calendar
+hl.window_rule({
+	match = {
+		class = "com.danklinux.dankcalendar",
+		title = "^New event — Dank Calendar$",
+	},
+	float = true,
+	size = { "(monitor_w*0.55)", "(monitor_h*0.65)" },
+	center = true,
+})
+
+-- LocalSend special workspace
+hl.bind(mainMod .. " + U", hl.dsp.workspace.toggle_special("localsend"))
+hl.workspace_rule({ workspace = "special:localsend", on_created_empty = "localsend" })
+hl.window_rule({
+	match = { class = "org.localsend.localsend_app" },
+	float = true,
+	size = { "(monitor_w*0.25)", "(monitor_h*0.65)" },
+	center = true,
+})
+
 -- Scroll through existing workspaces with mainMod + scroll
 hl.bind(mainMod .. " + mouse_down", hl.dsp.focus({ workspace = "e+1" }))
 hl.bind(mainMod .. " + mouse_up", hl.dsp.focus({ workspace = "e-1" }))

@@ -49,7 +49,7 @@ hl.bind("SUPER + ALT + J", hl.dsp.window.resize({ x = 0, y = resizeStep, relativ
 hl.bind("SUPER + ALT + K", hl.dsp.window.resize({ x = 0, y = -resizeStep, relative = true }))
 
 -- change horizontal vs vertical tiling (togglesplit)
-hl.bind(mainMod .. " + ALT + O", hl.dsp.layout("togglesplit"))
+hl.bind(mainMod .. " + SHIFT + O", hl.dsp.layout("togglesplit"))
 
 -- spotify special workspace
 hl.bind(mainMod .. " + M", hl.dsp.workspace.toggle_special("spotify"))
@@ -116,6 +116,11 @@ hl.window_rule({
 	center = true,
 	opacity = "0.9",
 })
+
+-- Voxtype - speech to text
+hl.bind(mainMod .. " + R", hl.dsp.exec_cmd("voxtype record start"))
+
+hl.bind(mainMod .. " + R", hl.dsp.exec_cmd("voxtype record stop"), { release = true })
 
 -- Scroll through existing workspaces with mainMod + scroll
 hl.bind(mainMod .. " + mouse_down", hl.dsp.focus({ workspace = "e+1" }))

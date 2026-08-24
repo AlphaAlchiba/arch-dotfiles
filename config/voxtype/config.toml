@@ -13,7 +13,9 @@ modifiers = []
 device = "default"
 sample_rate = 16000
 max_duration_secs = 60
-# pause_media = true   # optional: pauses Spotify/Firefox while dictating (needs playerctl)
+# Pause MPRIS media players (Spotify, Firefox, etc.) while dictating,
+# resume them when recording stops. Requires playerctl.
+pause_media = true
 
 [audio.feedback]
 enabled = true

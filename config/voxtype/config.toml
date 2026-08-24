@@ -1,0 +1,45 @@
+# Voxtype configuration — managed via dotfiles (stowed to ~/.config/voxtype)
+# Full annotated reference: https://voxtype.io/docs/CONFIGURATION
+
+state_file = "auto"
+
+[hotkey]
+# Built-in hotkey disabled — Hyprland keybindings (Super+R) control recording
+enabled = false
+key = "SCROLLLOCK"
+modifiers = []
+
+[audio]
+device = "default"
+sample_rate = 16000
+max_duration_secs = 60
+# pause_media = true   # optional: pauses Spotify/Firefox while dictating (needs playerctl)
+
+[audio.feedback]
+enabled = false
+
+[whisper]
+model = "small.en"     # or "medium.en" for max accuracy (slower on 4GB GPU)
+language = "en"
+translate = false
+# Use the NVIDIA dGPU (index 1) for Vulkan inference, not the Intel iGPU (index 0)
+gpu_device = 1
+# Faster transcription for short dictations (smaller context window for clips <22.5s)
+context_window_optimization = true
+
+[output]
+mode = "type"
+fallback_to_clipboard = true
+type_delay_ms = 0
+
+[output.notification]
+on_recording_start = true
+on_recording_stop = true
+on_transcription = false
+
+[text]
+spoken_punctuation = true
+filter_filler_words = true
+
+[vad]
+enabled = true

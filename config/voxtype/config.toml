@@ -16,16 +16,26 @@ max_duration_secs = 60
 # pause_media = true   # optional: pauses Spotify/Firefox while dictating (needs playerctl)
 
 [audio.feedback]
-enabled = false
+enabled = true
+theme = "subtle"
+volume = 0.4
 
 [whisper]
-model = "small.en"     # or "medium.en" for max accuracy (slower on 4GB GPU)
+# Multilingual EN/FR alternative (slower, can misdetect mixed speech):
+# model = "small"
+# language = ["en", "fr"]
+model = "small.en"     # English-only — fastest, best for English dictation
 language = "en"
 translate = false
 # Use the NVIDIA dGPU (index 1) for Vulkan inference, not the Intel iGPU (index 0)
 gpu_device = 1
 # Faster transcription for short dictations (smaller context window for clips <22.5s)
 context_window_optimization = true
+# Experimental streaming — types ~5s chunks while speaking, but cuts sentences
+# at chunk boundaries and adds "..." artifacts. Disabled: clean all-at-once output.
+# eager_processing = true
+# eager_chunk_secs = 5.0
+# eager_overlap_secs = 0.5
 
 [output]
 mode = "type"
@@ -33,8 +43,8 @@ fallback_to_clipboard = true
 type_delay_ms = 0
 
 [output.notification]
-on_recording_start = true
-on_recording_stop = true
+on_recording_start = false
+on_recording_stop = false
 on_transcription = false
 
 [text]

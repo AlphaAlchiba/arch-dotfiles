@@ -139,6 +139,11 @@ hl.config({
 
 -- Brain Shell Autostarts
 hl.on("hyprland.start", function()
+	-- Import the session environment and start the voxtype daemon.
+	-- graphical-session.target refuses manual start (RefuseManualStart=yes)
+	-- and no session manager (uwsm) is installed, so start the service directly.
+	hl.exec_cmd("systemctl --user import-environment")
+	hl.exec_cmd("systemctl --user start voxtype.service")
 	hl.exec_cmd("awww-daemon")
 	hl.exec_cmd("hypridle -c " .. os.getenv("HOME") .. "/.local/src/Brain_Shell/src/config/hypridle.conf")
 	hl.exec_cmd("quickshell -c " .. os.getenv("HOME") .. "/.local/src/Brain_Shell")

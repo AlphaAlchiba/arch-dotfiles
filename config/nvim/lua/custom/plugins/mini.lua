@@ -18,4 +18,26 @@ require('mini.hipatterns').setup {
   },
 }
 
+-- Move lines/blocks with Alt+hjkl: current line in normal mode,
+-- visual selection in visual mode (same keys, mode-dependent)
+require('mini.move').setup {
+  mappings = {
+    left = '<A-h>',
+    right = '<A-l>',
+    down = '<A-j>',
+    up = '<A-k>',
+    line_left = '<A-h>',
+    line_right = '<A-l>',
+    line_down = '<A-j>',
+    line_up = '<A-k>',
+  },
+}
+
+-- Highlight trailing whitespace and strip it on save
+require('mini.trailspace').setup {}
+vim.api.nvim_create_autocmd('BufWritePre', {
+  group = vim.api.nvim_create_augroup('mini-trailspace-trim', { clear = true }),
+  callback = function() MiniTrailspace.trim() end,
+})
+
 vim.keymap.set('n', '<leader>e', MiniFiles.open, { desc = 'Open mini.files' })

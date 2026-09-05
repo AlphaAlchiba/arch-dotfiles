@@ -123,10 +123,9 @@ After `usermod`, log out and back in for the docker group to take effect.
 | `<Space>sr` | Resume last search |
 | `<Space>ss` | Select telescope picker |
 | `<Space>sn` | Search nvim config files |
-| `<Space>bb` | Find buffers |
+| `<Space><Space>` | Find buffers |
 | `<Space>/` | Fuzzily search in current buffer |
 | `<Space>e` | Open mini.files |
-| `\` | Reveal file in neo-tree |
 | `<Space>gg` | Git status (Neogit) |
 | `<Space>gd` | Git diff (Diffview) |
 | `<Space>u` | Toggle undotree |
@@ -142,6 +141,12 @@ After `usermod`, log out and back in for the docker group to take effect.
 | `]c` / `[c` | Next/previous git hunk |
 | `<F5>` | Debug continue |
 | `<Space>b` | Toggle breakpoint |
+| `<Space>lp` | Log variable under cursor (chainsaw) |
+| `<Space>lo` | Log object under cursor (chainsaw) |
+| `<Space>lt` | Log type under cursor (chainsaw) |
+| `<Space>lr` | Remove all chainsaw log statements |
+| `<Space>lc` | Clear console (chainsaw) |
+| `Tab` / `S-Tab` | Jump out of / back into brackets, quotes (insert mode, tabout) |
 
 ## Architecture Notes
 

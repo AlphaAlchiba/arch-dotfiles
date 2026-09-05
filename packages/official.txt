@@ -27,6 +27,7 @@ freecad
 fzf
 git
 git-delta
+github-cli
 greetd
 greetd-tuigreet
 grub
@@ -69,6 +70,7 @@ obsidian
 openssh
 otf-font-awesome
 papirus-icon-theme
+pass
 pavucontrol
 pipewire
 pipewire-alsa

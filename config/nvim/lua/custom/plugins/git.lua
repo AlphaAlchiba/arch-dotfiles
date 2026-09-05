@@ -31,3 +31,4 @@ vim.keymap.set('n', '<leader>gD', ':DiffviewOpen HEAD~1<CR>', { desc = '[G]it [D
 vim.keymap.set('n', '<leader>gc', ':DiffviewClose<CR>', { desc = '[G]it diffview [C]lose' })
 vim.keymap.set('n', '<leader>gh', ':DiffviewFileHistory %<CR>', { desc = '[G]it file [H]istory' })
 vim.keymap.set('n', '<leader>gH', ':DiffviewFileHistory<CR>', { desc = '[G]it repo [H]istory' })
+vim.keymap.set('n', '<leader>gb', ':Gitsigns blame<CR>', { desc = '[G]it [B]lame (gitsigns)' })

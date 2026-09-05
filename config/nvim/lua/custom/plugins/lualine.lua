@@ -36,6 +36,11 @@ require('lualine').setup {
 
     lualine_x = {
       {
+        -- Show chainsaw log statement count (icon + N) while logs exist
+        function() return require('chainsaw.visuals.statusline').countInBuffer() end,
+        cond = function() return require('chainsaw.visuals.statusline').countInBuffer() ~= '' end,
+      },
+      {
         'encoding',
         color = { fg = subtle_fg, bg = bar_bg },
       },

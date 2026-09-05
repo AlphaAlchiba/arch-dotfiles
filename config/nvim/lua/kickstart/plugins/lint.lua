@@ -5,7 +5,8 @@ vim.pack.add { 'https://github.com/mfussenegger/nvim-lint' }
 local lint = require 'lint'
 lint.linters_by_ft = {
   markdown = { 'markdownlint' },
-  python = { 'ruff' },
+  -- python: ruff LSP (servers.ruff) already reports lint diagnostics; running
+  -- ruff here too would duplicate every diagnostic
   lua = { 'selene' },
   javascript = { 'eslint_d' },
   typescript = { 'eslint_d' },

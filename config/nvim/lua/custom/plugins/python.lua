@@ -58,3 +58,5 @@ vim.keymap.set('n', '<leader>do', function() dap.step_out() end, { desc = '[D]eb
 vim.keymap.set('n', '<leader>dt', function() dap.toggle_breakpoint() end, { desc = '[D]ebug [T]oggle breakpoint' })
 vim.keymap.set('n', '<leader>dT', function() dap.set_breakpoint(vim.fn.input 'Breakpoint condition: ') end, { desc = '[D]ebug conditional breakpoin[T]' })
 vim.keymap.set('n', '<leader>du', function() require('dapui').toggle() end, { desc = '[D]ebug [U]I toggle' })
+vim.keymap.set('n', '<leader>dR', function() dap.restart() end, { desc = '[D]ebug [R]estart session' })
+vim.keymap.set('n', '<leader>dX', function() dap.terminate() end, { desc = '[D]ebug terminate (e[X]it)' })

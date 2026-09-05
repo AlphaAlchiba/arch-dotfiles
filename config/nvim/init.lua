@@ -404,6 +404,7 @@ do
       { '<leader>d', group = '[D]atabase / [D]ebug', mode = { 'n' } },
       { '<leader>e', group = '[E]xplorer / [E]dit', mode = { 'n' } },
       { '<leader>f', group = '[F]ormat', mode = { 'n', 'v' } },
+      { '<leader>l', group = '[L]og', mode = { 'n', 'v' } },
       { '<leader>u', group = '[U]ndotree', mode = { 'n' } },
       { '<leader>b', group = '[B]reakpoint', mode = { 'n' } },
       { 'gr', group = 'LSP Actions', mode = { 'n' } },
@@ -553,6 +554,9 @@ do
   vim.keymap.set('n', '<leader>sr', builtin.resume, { desc = '[S]earch [R]esume' })
   vim.keymap.set('n', '<leader>s.', builtin.oldfiles, { desc = '[S]earch Recent Files ("." for repeat)' })
   vim.keymap.set('n', '<leader>sc', builtin.commands, { desc = '[S]earch [C]ommands' })
+  vim.keymap.set('n', '<leader>sGc', builtin.git_commits, { desc = '[S]earch [G]it [C]ommits' })
+  vim.keymap.set('n', '<leader>sGb', builtin.git_branches, { desc = '[S]earch [G]it [B]ranches' })
+  vim.keymap.set('n', '<leader>sGs', builtin.git_status, { desc = '[S]earch [G]it [S]tatus' })
   vim.keymap.set('n', '<leader><leader>', builtin.buffers, { desc = '[ ] Find existing buffers' })
 
   -- Add Telescope-based LSP pickers when an LSP attaches to a buffer.
@@ -826,6 +830,7 @@ do
     'selene',        -- Lua
     'markdownlint',  -- Markdown
     'yamllint',      -- YAML
+    'hadolint',      -- Dockerfile
   })
 
   require('mason-tool-installer').setup { ensure_installed = ensure_installed }
@@ -973,7 +978,16 @@ do
     },
 
     sources = {
-      default = { 'lsp', 'path', 'snippets' },
+      default = { 'lsp', 'path', 'snippets', 'dadbod' },
+      providers = {
+        -- vim-dadbod-completion has a native blink source: completes table
+        -- names, column names and SQL keywords from the active DB connection
+        dadbod = {
+          name = 'dadbod',
+          module = 'vim_dadbod_completion.blink',
+          score_offset = 100,
+        },
+      },
     },
 
     snippets = { preset = 'luasnip' },

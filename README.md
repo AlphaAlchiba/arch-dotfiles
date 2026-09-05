@@ -113,40 +113,116 @@ After `usermod`, log out and back in for the docker group to take effect.
 
 ### Neovim (leader = `Space`)
 
+#### Search & Files (Telescope)
+
 | Keys | Action |
 |---|---|
 | `<Space>sh` | Search help |
+| `<Space>sk` | Search keymaps |
 | `<Space>sf` | Find files |
-| `<Space>sg` | Live grep |
+| `<Space>ss` | Select telescope picker |
 | `<Space>sw` | Search current word |
+| `<Space>sg` | Live grep |
+| `<Space>s/` | Live grep in open files |
 | `<Space>sd` | Search diagnostics |
 | `<Space>sr` | Resume last search |
-| `<Space>ss` | Select telescope picker |
+| `<Space>s.` | Recent files |
+| `<Space>sc` | Search commands |
 | `<Space>sn` | Search nvim config files |
+| `<Space>sGc` | Git commits |
+| `<Space>sGb` | Git branches |
+| `<Space>sGs` | Git status |
 | `<Space><Space>` | Find buffers |
 | `<Space>/` | Fuzzily search in current buffer |
 | `<Space>e` | Open mini.files |
+
+#### Git
+
+| Keys | Action |
+|---|---|
 | `<Space>gg` | Git status (Neogit) |
-| `<Space>gd` | Git diff (Diffview) |
+| `<Space>gd` | Git diff (staged vs working) |
+| `<Space>gD` | Git diff against last commit |
+| `<Space>gc` | Close diffview |
+| `<Space>gh` | Git file history |
+| `<Space>gH` | Git repo history |
+| `<Space>gb` | Git blame (gitsigns) |
+| `]c` / `[c` | Next/previous git hunk |
+
+#### LSP
+
+| Keys | Action |
+|---|---|
+| `grr` | References |
+| `gri` | Implementations |
+| `grd` | Definition |
+| `grt` | Type definition |
+| `grD` | Declaration |
+| `grn` | Rename |
+| `gra` | Code action |
+| `gO` | Document symbols |
+| `gW` | Workspace symbols |
+| `gK` | Signature help |
+| `K` | Hover |
+| `<Space>th` | Toggle inlay hints |
+
+#### Debug & Test
+
+| Keys | Action |
+|---|---|
+| `<F5>` | Debug continue |
+| `<Space>b` | Toggle breakpoint |
+| `<Space>dd` | Debug continue/start |
+| `<Space>ds` | Step over |
+| `<Space>di` | Step into |
+| `<Space>do` | Step out |
+| `<Space>dt` | Toggle breakpoint |
+| `<Space>dT` | Conditional breakpoint |
+| `<Space>dR` | Restart session |
+| `<Space>dX` | Terminate session |
+| `<Space>du` | Toggle DAP UI |
+| `<Space>tt` | Run nearest test |
+| `<Space>tf` | Run test file |
+| `<Space>tl` | Run last test |
+| `<Space>ts` | Stop tests |
+| `<Space>to` | Toggle test output |
+
+#### Log (chainsaw)
+
+| Keys | Action |
+|---|---|
+| `<Space>lp` | Log variable under cursor |
+| `<Space>lo` | Log object under cursor |
+| `<Space>lt` | Log type under cursor |
+| `<Space>lr` | Remove all chainsaw log statements |
+| `<Space>lc` | Clear console |
+
+#### Other
+
+| Keys | Action |
+|---|---|
+| `<Space>a` | Toggle aerial outline |
 | `<Space>u` | Toggle undotree |
 | `<Space>q` | Open diagnostic quickfix list |
 | `<Space>f` | Format buffer |
 | `<Space>db` | Database UI (Dadbod) |
+| `<Space>dq` | Database query |
+| `Tab` / `S-Tab` | Jump out of / back into brackets, quotes (insert mode) |
+| `Alt + h/j/k/l` | Move line (normal) / selection (visual) |
 | `Ctrl + h/j/k/l` | Navigate splits / tmux panes |
-| `grr` | LSP references |
-| `grn` | LSP rename |
-| `gra` | LSP code action |
-| `grd` | LSP go to definition |
-| `gO` | LSP document symbols |
-| `]c` / `[c` | Next/previous git hunk |
-| `<F5>` | Debug continue |
-| `<Space>b` | Toggle breakpoint |
-| `<Space>lp` | Log variable under cursor (chainsaw) |
-| `<Space>lo` | Log object under cursor (chainsaw) |
-| `<Space>lt` | Log type under cursor (chainsaw) |
-| `<Space>lr` | Remove all chainsaw log statements |
-| `<Space>lc` | Clear console (chainsaw) |
-| `Tab` / `S-Tab` | Jump out of / back into brackets, quotes (insert mode, tabout) |
+| `Ctrl + \` | Previous split / tmux pane |
+| `Ctrl + Backspace` | Delete previous word |
+| `zR` / `zM` | Open / close all folds |
+| `<Esc>` | Clear search highlight |
+| `<Esc><Esc>` | Exit terminal mode |
+
+#### Neovim plugin notes
+
+- **chainsaw** (`<Space>lp/lo/lt/lr/lc`): inserts log statements for the variable under the cursor (or visual selection). Every log line carries the 🪚 marker; `<Space>lr` removes all chainsaw log lines. The statusline shows a 🪚 counter while logs exist in the buffer. Other log types (assert, emoji, stacktrace, time, sound…) are available via `:Chainsaw <name>`.
+- **tabout** (`Tab`/`S-Tab` in insert mode): jumps out of / back into brackets, quotes, etc. Falls back to normal Tab indentation when no pair is found. Snippet navigation via Tab keeps working — blink.cmp's fallback resolves to tabout.
+- **dadbod SQL completion**: with an active vim-dadbod connection (`:DB` or DBUI), typing in SQL buffers completes table names, column names, and SQL keywords from the connected database's schema (`table.` triggers column completion). Requires a live connection; without one, no completions appear.
+- **mini.move** (`Alt + h/j/k/l`): moves the current line in normal mode, the visual selection in visual mode.
+- **mini.trailspace**: highlights trailing whitespace and strips it automatically on save.
 
 ## Architecture Notes
 

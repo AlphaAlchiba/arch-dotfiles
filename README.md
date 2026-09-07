@@ -209,7 +209,7 @@ Notes on the semantics:
 |---|---|
 | `<Space>sh` | Search help |
 | `<Space>sk` | Search keymaps |
-| `<Space>sf` | Find files |
+| `<Space>sf` | Find files (incl. hidden) |
 | `<Space>ss` | Select telescope picker |
 | `<Space>sw` | Search current word |
 | `<Space>sg` | Live grep |

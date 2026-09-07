@@ -32,6 +32,11 @@ require('lualine').setup {
         path = 0,
         color = { fg = subtle_fg, bg = bar_bg },
       },
+      {
+        -- Git change counts for the current file: +added ~modified -removed
+        'diff',
+        color = { fg = subtle_fg, bg = bar_bg },
+      },
     },
 
     lualine_x = {

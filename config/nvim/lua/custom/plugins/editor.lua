@@ -56,6 +56,21 @@ require('ufo').setup {
 }
 vim.keymap.set('n', 'zR', require('ufo').openAllFolds, { desc = 'Open all folds' })
 vim.keymap.set('n', 'zM', require('ufo').closeAllFolds, { desc = 'Close all folds' })
+-- zi: toggle all folds open/closed (ufo APIs keep foldlevel unchanged)
+vim.keymap.set('n', 'zi', function()
+  local any_closed = false
+  for lnum = 1, vim.fn.line '$' do
+    if vim.fn.foldclosed(lnum) ~= -1 then
+      any_closed = true
+      break
+    end
+  end
+  if any_closed then
+    require('ufo').openAllFolds()
+  else
+    require('ufo').closeAllFolds()
+  end
+end, { desc = 'Toggle all folds' })
 
 -- Load per-language syntax highlight overrides
 require('custom.highlights')

@@ -302,6 +302,7 @@ Notes on the semantics:
 | `Ctrl + h/j/k/l` | Navigate splits / tmux panes |
 | `Ctrl + \` | Previous split / tmux pane |
 | `Ctrl + Backspace` | Delete previous word |
+| `zi` | Toggle all folds open/closed |
 | `zR` / `zM` | Open / close all folds |
 | `<Esc>` | Clear search highlight |
 | `<Esc><Esc>` | Exit terminal mode |

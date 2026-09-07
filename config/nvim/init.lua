@@ -158,6 +158,10 @@ do
   -- Decrease mapped sequence wait time
   vim.o.timeoutlen = 300
 
+  -- Open files with all folds unfolded (foldlevelstart=99 overrides the
+  -- default foldlevel=0 which closes every fold on open)
+  vim.o.foldlevelstart = 99
+
   -- Configure how new splits should be opened
   vim.o.splitright = true
   vim.o.splitbelow = true

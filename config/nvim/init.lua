@@ -737,7 +737,17 @@ do
   ---@type table<string, vim.lsp.Config>
   local servers = {
     clangd = {},
-    -- pyright = {},  -- disabled: using ty (astral) instead
+    pyright = {
+      -- Completions only: ty handles type checking, so pyright's type
+      -- checking is disabled to avoid duplicate diagnostics.
+      settings = {
+        python = {
+          analysis = {
+            typeCheckingMode = 'off',
+          },
+        },
+      },
+    },
     rust_analyzer = {},
 
     ruff = {
@@ -841,6 +851,13 @@ do
   end
 
   -- Astral ty: Python LSP (install via `uv tool install ty`)
+  -- Keep ty as the type checker, but disable its completions to avoid
+  -- duplicate items with pyright in the completion menu.
+  vim.lsp.config('ty', {
+    on_init = function(client)
+      client.server_capabilities.completionProvider = nil
+    end,
+  })
   vim.lsp.enable('ty')
 end
 

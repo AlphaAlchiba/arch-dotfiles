@@ -4,6 +4,9 @@ vim.pack.add {
 }
 require('noice').setup {
   lsp = {
+    -- pyright re-analyzes on every keystroke; hide the LSP progress popup
+    -- (bottom-right corner) that would otherwise flash constantly
+    progress = { enabled = false },
     -- override markdown rendering so **Treesitter** handles hover/signature docs
     override = {
       ['vim.lsp.util.convert_input_to_markdown_lines'] = true,

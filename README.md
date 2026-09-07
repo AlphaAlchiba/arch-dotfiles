@@ -46,7 +46,7 @@ After `usermod`, log out and back in for the docker group to take effect.
 3. **Set up OpenCode API key** — `echo 'export CONTEXT7_API_KEY="your-key"' > ~/.opencode-secrets && chmod 600 ~/.opencode-secrets`
 4. **Restore wallpapers** — copy your collection to `~/wallpapers/`
 5. **Log into accounts** — browsers, Spotify, Signal, Mullvad VPN
-6. **Reload tmux** — run `tmux source-file ~/.config/tmux/tmux.conf` or `prefix+r`, then `prefix+I` to install plugins
+6. **Reload tmux** — run `tmux source-file ~/.config/tmux/tmux.conf` or `prefix + r`
 
 ## Key Bindings Reference
 
@@ -85,31 +85,106 @@ After `usermod`, log out and back in for the docker group to take effect.
 
 ### Tmux (prefix = `Alt + Space`)
 
+`Ctrl+b` is intentionally unbound; the prefix is `Alt + Space`. The tables below mirror `~/.config/tmux/tmux.conf` — keep them in sync when the config changes.
+
+#### Prefix & Sessions
+
 | Keys | Action |
 |---|---|
-| `Alt+Space` | Prefix key |
-| `prefix + r` | Reload tmux config |
-| `prefix + \|` | Split pane horizontally |
-| `prefix + -` | Split pane vertically |
-| `prefix + \` | Split pane horizontally (full width) |
-| `prefix + _` | Split pane vertically (full height) |
-| `prefix + Enter` | New window |
-| `prefix + w` | Choose window |
+| `Alt+Space` | Prefix key (prefix again sends `Alt+Space` to the app) |
+| `prefix + r` | Reload tmux config (`source-file` + status message) |
+| `prefix + d` | Detach session (default binding — session keeps running) |
+| `prefix + s` | Fzf session switcher popup (excludes current session) |
+| `prefix + S` | Choose session |
+| `prefix + N` | New session popup (prompts for a name) |
+
+#### Windows
+
+| Keys | Action |
+|---|---|
+| `prefix + Enter` | New window (in pane's current directory) |
 | `prefix + ,` | Rename window |
-| `prefix + C` | Kill window |
-| `prefix + c` / `prefix + x` | Kill pane |
-| `prefix + z` | Zoom pane |
-| `prefix + H/J/K/L` | Resize pane (3px) |
-| `prefix + g` | Open lazygit popup |
-| `prefix + s` | Fzf session switcher |
-| `prefix + N` | New session prompt |
-| `prefix + y` | Open yazi file manager |
-| `prefix + P` | Edit .zshrc in nvim |
-| `prefix + t` | New zsh popup |
-| `Ctrl + h/j/k/l` | Navigate panes (vim-style, passes through to vim when detected) |
-| `Ctrl + \` | Previous pane |
+| `prefix + w` | Choose window |
+| `prefix + C` | Kill window (no confirmation) |
+| `prefix + n` / `prefix + p` | Next / previous window (repeatable) |
+
+Windows are 1-based and renumber automatically when one is killed (`renumber-windows on`).
+
+#### Panes
+
+| Keys | Action |
+|---|---|
+| `prefix + \|` | Split left/right (in pane's current directory) |
+| `prefix + -` | Split top/bottom (in pane's current directory) |
+| `prefix + \` | Split left/right, pane spans full window height |
+| `prefix + _` | Split top/bottom, pane spans full window width |
+| `prefix + c` / `prefix + x` | Kill pane (no confirmation) |
+| `prefix + z` | Zoom pane (toggle) |
+| `prefix + H/J/K/L` | Resize pane by 3 cells (repeatable) |
+| `prefix + m` / `prefix + M` | Move pane into window (prompt) / to the right into window |
+
+#### Pane Navigation
+
+| Keys | Action |
+|---|---|
+| `prefix + h/j/k/l` | Select pane (vim-style) |
+
+#### Global Keys (no prefix)
+
+| Keys | Action |
+|---|---|
+| `Ctrl + h/j/k/l` | Navigate panes (passes through to vim when detected) |
+| `Ctrl + \` | Previous pane / split |
 | `Ctrl + Backspace` | Delete previous word (passthrough to app) |
 | `Shift + Enter` | Passthrough to app |
+
+#### Popups
+
+| Keys | Action |
+|---|---|
+| `prefix + g` | Open lazygit popup (90% size, pane's cwd) |
+| `prefix + y` | Open yazi file manager (90% size, pane's cwd) |
+| `prefix + t` | New zsh popup (75% size) |
+| `prefix + P` | Edit `.zshrc` in nvim (80% size) |
+| `prefix + N` | New session popup (prompts for a name) |
+| `prefix + s` | Fzf session switcher |
+| `prefix + S` | Choose session |
+
+#### Copy Mode
+
+| Keys | Action |
+|---|---|
+| `prefix + [` | Enter copy mode (vi keys); mouse scroll also enters it |
+| `v` | Begin selection |
+| `y` | Yank selection and exit copy mode |
+| `q` | Exit copy mode |
+
+#### Quitting / Leaving tmux
+
+| Keys | Action |
+|---|---|
+| `prefix + c` / `prefix + x` | Kill current pane (no confirmation) |
+| `prefix + C` | Kill current window (no confirmation) |
+| `prefix + d` | Detach — leave tmux, keep the session running |
+| `prefix + :` → `kill-session` | Kill the current session |
+| `prefix + :` → `kill-server` | Shut down the whole tmux server |
+
+Notes on the semantics:
+
+- The destructive keys (`c`, `x`, `C`) fire **without a confirmation prompt** — the default `confirm-before` on `x` was deliberately replaced by an instant `kill-pane`. Most panes run nvim or opencode, so killing a pane kills that process too — exit the app cleanly first when you care about unsaved work.
+- Killing the **last pane/window of a session** ends that session; tmux shuts down when the last session dies (`exit-empty` is on by default). You land back in the shell that launched the session.
+- `prefix + d` detaches instead — the session keeps running and you can return with `tms` or the session scripts.
+- Sessions started by the `tmux-sessions` scripts are just attached clients; ending them simply returns you to the launcher shell (the server stays alive if other sessions exist).
+
+#### Tmux config notes
+
+- **Prefix**: `Ctrl+b` is unbound and replaced with `Alt + Space` (with `Alt + Space` also bound as `send-prefix` for apps that use the chord). `escape-time 0` makes the Alt-prefix respond instantly instead of waiting for a potential ESC sequence.
+- **Terminal**: `default-terminal tmux-256color` with `Tc` (truecolor) and `Km` (kitty keyboard protocol) terminal overrides; `extended-keys` + `extended-keys-format csi-u` and `allow-passthrough on` let Kitty's CSI-u sequences flow through to applications (see the CSI-u chain in Architecture Notes). `update-environment` carries `TERM`/`TERM_PROGRAM` through to panes.
+- **Core behavior**: `mode-keys vi` (vim-style copy mode), `mouse on`, 50k scrollback, `focus-events on` (nvim refreshes on pane focus), 1-based window/pane indices, and `renumber-windows on` (killing a window renumbers the rest). `repeat-time 700` enables the repeatable `n`/`p` and `H/J/K/L` binds.
+- **Status line**: `status-left`/`status-right` are emptied because vim-tpipeline injects nvim's lualine status through named pipes at runtime (see Architecture Notes). Session names are shown by the `window-status` format via `window_start_flag` — the window flagged as a session's start window gets a `#S` chip (`bg=#181825`/`fg=#FAB387`) prepended, so each session shows its name without needing `status-left`. The flag itself is applied to a session's start window outside the tracked config. Pane borders use `fg=colour234` (near-base) with heavy lines to blend into the background.
+- **Global key handlers**: `Ctrl+h/j/k/l` and `Ctrl+\` navigate panes, but an `is_vim` check (process running in the focused pane) passes the key through to vim instead — synchronized with vim-tmux-navigator on the nvim side (see Architecture Notes). `Ctrl+Backspace` and `Shift+Enter` are forwarded as CSI-u passthroughs (`\e[127;5u` and `S-Enter`) so apps receive them.
+- **Popups** use rounded borders and open `-E` (a command that exits with the popup) sized 75–90% of the window, most in the pane's current directory.
+- **Session workflow — no TPM**: TPM/resurrect/continuum are disabled (commented out in the config). Sessions are instead deterministic scripts in `~/.local/bin/tmux-sessions/` (`tmux-template`, `ideavault`; the directory is on `PATH` via `.zshrc`): each is idempotent (`has-session` check), builds the full layout on first run — per-project windows with an nvim pane, a 30% opencode pane, and a 20% utility pane, root-level windows moved to indices 8–9, start window selected — then attaches. The `tms` (fzf session switcher) and `tmn` (new session) zsh functions handle switching/creating from the shell.
 
 ### Neovim (leader = `Space`)
 
@@ -255,7 +330,7 @@ Three layers must stay synchronized:
 
 ### Session Persistence
 
-- **tmux-resurrect** + **tmux-continuum** saves/restores tmux sessions across reboots
+- **tmux**: TPM/resurrect/continuum are disabled. Deterministic `tmux-sessions` scripts (`tmux-template`, `ideavault`) recreate the full session layout on demand — windows, panes, and the nvim/opencode processes they start. Re-running a script is idempotent: it attaches to the existing session or rebuilds it.
 - **persistence.nvim** saves/restores nvim sessions per-project
 - **nvim-pack-lock.json** pins all plugin versions for reproducible restoration
 

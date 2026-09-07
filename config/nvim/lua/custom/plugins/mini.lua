@@ -3,9 +3,17 @@ require('mini.colors').setup()
 
 -- Smooth scrolling only. Cursor animation disabled (clashes with Kitty native cursor).
 -- Open/close animations disabled (conflict with Noice UI).
-require('mini.animate').setup {
+local animate = require('mini.animate')
+animate.setup {
   cursor = { enable = false },
-  scroll = { enable = true },
+  scroll = {
+    enable = true,
+    -- Snappier than default (250ms): 100ms total, and cap each step at
+    -- 10ms so rapid trackpad/key scrolls don't lag behind (see
+    -- mini.animate docs on mouse wheel scrolling)
+    timing = function(_, n) return math.min(100 / n, 10) end,
+    subscroll = animate.gen_subscroll.equal { max_output_steps = 40 },
+  },
   resize = { enable = false },
   open   = { enable = false },
   close  = { enable = false },

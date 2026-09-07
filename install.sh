@@ -9,8 +9,8 @@
 #   2. Installs all packages from packages/official.txt and packages/aur.txt
 #   3. Stows config files into ~/.config with symlinks
 #   4. Clones Brain_Shell to ~/.local/src/Brain_Shell
-#   5. Installs tmux plugins via TPM
-#   6. Injects OpenCode API key from ~/.opencode-secrets
+#   5. Enables user systemd services (voxtype, cliphist-wipe)
+#   6. Checks for OpenCode API key in ~/.opencode-secrets
 #
 # Manual steps required after (see end of script):
 #   - Enable and start system services (docker, firewalld)
@@ -103,19 +103,18 @@ else
     git -C "$HOME/.local/src/Brain_Shell" pull --ff-only 2>/dev/null || true
 fi
 
-# ── 5. Tmux plugins (TPM + resurrect + continuum) ─────────────────────────
-if [ ! -d "$HOME/.tmux/plugins/tpm" ]; then
-    log "Installing tmux plugins..."
-    git clone https://github.com/tmux-plugins/tpm "$HOME/.tmux/plugins/tpm"
-    "$HOME/.tmux/plugins/tpm/bin/install_plugins" 2>/dev/null || true
-else
-    log "Tmux plugins already installed."
-fi
+# ── 5. Enable user systemd services ───────────────────────────────────────
+# tmux is configured without TPM plugins (see config/tmux/tmux.conf);
+# sessions are built by the deterministic tmux-sessions scripts instead.
+log "Enabling user systemd services..."
+systemctl --user daemon-reload
+systemctl --user enable voxtype.service cliphist-wipe.service 2>/dev/null || \
+    warn "Could not enable user services (finish the install manually)"
 
 # ── 6. OpenCode API key ────────────────────────────────────────────────────
 if [ -f "$HOME/.opencode-secrets" ]; then
     log "OpenCode secrets file found (already configured)."
-elif [ ! -f "$HOME/.opencode-secrets" ]; then
+else
     echo ""
     warn "OpenCode API key not found."
     warn "To set it up later:"

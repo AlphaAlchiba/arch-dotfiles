@@ -67,10 +67,6 @@ alias 2='cd -2'
 alias 3='cd -3'
 alias 4='cd -4'
 
-# Windows Navigation
-alias win='cd /mnt/c/Users/josselin.peniguel'
-hash -d win=/mnt/c/Users/josselin.peniguel
-
 # --- 4. Aliases (Modern Tools) ---
 
 # Tree command ignore pattern
@@ -137,7 +133,7 @@ alias tldrl='tldr -l | fzf --preview "tldr {1} --color=always" --preview-window=
 sn() {
   if [[ -t 0 && $# -eq 0 ]]; then
     # Read from clipboard, strip, copy back, and print
-    powershell.exe -command "Get-Clipboard" | sed -E 's/^[[:space:]]*[0-9]+[[:space:]]?//' | tee >(pbcopy)
+    wl-paste | sed -E 's/^[[:space:]]*[0-9]+[[:space:]]?//' | tee >(pbcopy)
   else
     # Read from pipe/file, strip, copy to clipboard, and print
     sed -E 's/^[[:space:]]*[0-9]+[[:space:]]?//' "$@" | tee >(pbcopy)
@@ -188,20 +184,13 @@ alias dclog='docker-compose logs -f'
 
 # --- 4c. Infrastructure & Tools ---
 alias tf='terraform'
-alias clip="clip.exe"
-alias vclip="powershell.exe -command 'Get-Clipboard'"
+alias open='xdg-open'                    # Open files/dirs with the default app
 
-# WSL-Windows QoL Improvements
-alias open='explorer.exe .'              # Open current folder in Windows Explorer
-alias pbcopy='clip.exe'                  # macOS-style clipboard copy
-alias pbpaste='powershell.exe -command "Get-Clipboard"' # macOS-style clipboard paste
-alias powershell='powershell.exe'        # Run PowerShell directly
-alias cmd='cmd.exe'                      # Run CMD directly
-
-# Browse Windows from CLI
-alias wdoc='cd /mnt/c/Users/josselin.peniguel/Documents'
-alias wdl='cd /mnt/c/Users/josselin.peniguel/Downloads'
-alias wdt='cd /mnt/c/Users/josselin.peniguel/Desktop'
+# Clipboard (Wayland — wl-clipboard)
+alias clip='wl-copy'                     # Copy stdin to clipboard
+alias vclip='wl-paste'                   # Print clipboard contents
+alias pbcopy='wl-copy'                   # macOS-style clipboard copy
+alias pbpaste='wl-paste'                 # macOS-style clipboard paste
 
 # --- 4d. Yazi (File Manager) ---
 function y() {
@@ -241,7 +230,7 @@ bindkey -r '^T'
 bindkey '^F' fzf-file-widget
 export FZF_CTRL_T_COMMAND='rg --files --hidden --glob "!.git/*" $HOME'
 export FZF_CTRL_F_COMMAND="$FZF_CTRL_T_COMMAND"
-export FZF_CTRL_F_OPTS="--preview 'batcat --color=always --style=numbers --line-range :500 {}' --height 60% --layout=reverse --border"
+export FZF_CTRL_F_OPTS="--preview 'bat --color=always --style=numbers --line-range :500 {}' --height 60% --layout=reverse --border"
 
 # Ctrl+G: Go to Directory (Global)
 bindkey '^G' fzf-cd-widget
@@ -249,7 +238,8 @@ export FZF_ALT_C_COMMAND='find $HOME -mindepth 1 -maxdepth 5 -type d \( -name .g
 export FZF_ALT_C_OPTS="--height 40% --layout=reverse --border --preview 'tree -C {} | head -200'"
 
 export FZF_DEFAULT_COMMAND='rg --files --hidden --glob "!.git/*"'
-export FZF_DEFAULT_OPTS="--height 40% --layout=reverse --border"
+# Keep the Catppuccin colors from the FZF_DEFAULT_OPTS above; add layout flags
+export FZF_DEFAULT_OPTS="$FZF_DEFAULT_OPTS --height 40% --layout=reverse --border"
 
 # Tmux session switcher (fzf): tms
 #   - Lists all tmux sessions via fzf for selection
@@ -302,11 +292,12 @@ tmn() {
 
 # --- 7. Hardware/App Integration ---
 if [[ "$TERM" != "linux" ]]; then
-  _wezterm_osc7() {
+  # Report cwd via OSC7 so Kitty can open new tabs/windows in the same directory
+  _osc7() {
     printf "\033]7;file://%s%s\033\\" "${HOST:-$(hostname)}" "$PWD"
   }
-  add-zsh-hook chpwd _wezterm_osc7
-  _wezterm_osc7
+  add-zsh-hook chpwd _osc7
+  _osc7
 fi
 
 # --- 8. Plugins & Prompt ---

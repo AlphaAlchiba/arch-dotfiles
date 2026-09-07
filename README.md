@@ -57,29 +57,44 @@ After `usermod`, log out and back in for the docker group to take effect.
 | `Super + Return` | Open terminal (kitty) |
 | `Super + B` | Open browser (zen-browser) |
 | `Super + E` | Open file manager (dolphin) |
-| `Super + R` | Open app launcher (hyprlauncher) |
 | `Super + C` | Close focused window |
-| `Super + Q` | Quit Hyprland (if hyprshutdown is available) |
 | `Super + F` | Toggle fullscreen |
 | `Super + X` | Toggle window float |
-| `Super + V` | Open clipboard (Brain_Shell) |
-| `Super + S` | Screenshot region → satty annotation |
-| `Super + Shift + S` | Screenshot window → satty annotation |
-| `Super + P` | Color picker (hyprpicker) |
+| `Super + R` | Push-to-talk dictation (voxtype — hold to record) |
 | `Super + H/J/K/L` | Move focus (vim-style) |
 | `Super + Shift + H/J/K/L` | Move window |
 | `Super + Alt + H/J/K/L` | Resize window |
+| `Super + Shift + O` | Toggle tiling split direction |
 | `Super + 0-9` | Switch workspace |
 | `Super + Shift + 0-9` | Move window to workspace |
+| `Super + Alt + 0-9` | Move window to workspace (stay on current) |
+| `Super + Scroll` | Switch workspace |
+| `Super + Drag` | Move (left button) / resize (right button) window with mouse |
+| `Super + S` | Screenshot region → satty annotation |
+| `Super + Shift + S` | Screenshot window → satty annotation |
+| `Super + P` | Color picker (hyprpicker) |
 | `Super + M` | Toggle Spotify special workspace |
 | `Super + O` | Toggle Obsidian special workspace |
 | `Super + I` | Toggle Signal special workspace |
+| `Super + T` | Toggle Dank Calendar special workspace |
+| `Super + U` | Toggle LocalSend special workspace |
+| `XF86Audio*` / `XF86MonBrightness*` | Volume, mute, brightness, media keys (wpctl / playerctl / brightnessctl) |
 | `Super + D` | Dashboard home (Brain_Shell) |
+| `Super + Z` | Kanban dashboard (Brain_Shell) |
 | `Super + Space` | Dashboard launcher (Brain_Shell) |
-| `Super + A` | Audio output toggle (Brain_Shell) |
+| `Super + Shift + C` | Dashboard config (Brain_Shell) |
+| `Ctrl + Shift + Esc` | Dashboard stats (Brain_Shell) |
+| `Super + Esc` | Power menu (Brain_Shell) |
+| `Super + V` | Open clipboard (Brain_Shell) |
 | `Super + N` | Notifications popup (Brain_Shell) |
 | `Super + W` | Wallpaper picker (Brain_Shell) |
-| `Super + Esc` | Power menu (Brain_Shell) |
+| `Super + A` | Audio output toggle (Brain_Shell) |
+| `Super + Alt + I` | Audio input toggle (Brain_Shell) |
+| `Super + Shift + M` | Audio mixer (Brain_Shell) |
+| `Super + Alt + W` | WiFi toggle (Brain_Shell) |
+| `Super + Alt + B` | Bluetooth toggle (Brain_Shell) |
+| `Super + Alt + G` | VPN toggle (Brain_Shell) |
+| `Super + Alt + H` | Hotspot toggle (Brain_Shell) |
 | `Super + Period` | Focus mode (Brain_Shell) |
 | `Alt + F9` | Screen recording (Brain_Shell) |
 

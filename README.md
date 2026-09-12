@@ -243,9 +243,11 @@ Notes on the semantics:
 
 | Keys | Action |
 |---|---|
+| `gd` | Definition (jump) |
+| `gD` | Declaration (jump) |
 | `grr` | References |
 | `gri` | Implementations |
-| `grd` | Definition |
+| `grd` | Definition (fuzzy list) |
 | `grt` | Type definition |
 | `grD` | Declaration |
 | `grn` | Rename |

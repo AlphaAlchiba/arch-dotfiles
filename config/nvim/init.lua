@@ -678,6 +678,11 @@ do
         vim.keymap.set(mode, keys, func, { buffer = event.buf, desc = 'LSP: ' .. desc })
       end
 
+      -- Go to definition / declaration (standard Neovim keys).
+      -- `grd` (Telescope picker) is also available for a fuzzy list.
+      map('gd', vim.lsp.buf.definition, '[G]oto [D]efinition')
+      map('gD', vim.lsp.buf.declaration, '[G]oto [D]eclaration')
+
       -- Rename the variable under your cursor.
       --  Most Language Servers support renaming across files, etc.
       map('grn', vim.lsp.buf.rename, '[R]e[n]ame')
@@ -727,11 +732,11 @@ do
         })
       end
 
-      -- The following code creates a keymap to toggle inlay hints in your
-      -- code, if the language server you are using supports them
-      --
-      -- This may be unwanted, since they displace some of your code
+      -- Inlay hints (ty supports them natively): auto-enable on attach so
+      -- variable types and call argument names show immediately, and keep a
+      -- keymap to toggle them off/on.
       if client and client:supports_method('textDocument/inlayHint', event.buf) then
+        vim.lsp.inlay_hint.enable(true, { bufnr = event.buf })
         map('<leader>th', function() vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled { bufnr = event.buf }) end, '[T]oggle Inlay [H]ints')
       end
     end,
@@ -743,9 +748,12 @@ do
   ---@type table<string, vim.lsp.Config>
   local servers = {
     clangd = {},
+    -- pyright: completions ONLY (type checking off). ty handles type checking
+    -- and inlay hints. pyright is required because ty does not yet implement
+    -- "magic method" completions: typing `def __` inside a class body suggests
+    -- nothing in ty, while pyright suggests __init__, __str__, __repr__, etc.
+    -- pyright's inlay hints are disabled below to avoid duplicates with ty's.
     pyright = {
-      -- Completions only: ty handles type checking, so pyright's type
-      -- checking is disabled to avoid duplicate diagnostics.
       settings = {
         python = {
           analysis = {
@@ -753,6 +761,9 @@ do
           },
         },
       },
+      on_init = function(client)
+        client.server_capabilities.inlayHintProvider = nil
+      end,
     },
     rust_analyzer = {},
 
@@ -856,13 +867,29 @@ do
     vim.lsp.enable(name)
   end
 
-  -- Astral ty: Python LSP (install via `uv tool install ty`)
-  -- Keep ty as the type checker, but disable its completions to avoid
-  -- duplicate items with pyright in the completion menu.
+  -- Astral ty: Python type checker + inlay hints (install via `uv tool install ty`)
+  -- ty's completions and signature help are disabled because pyright provides
+  -- them (including magic methods like __init__/__str__, which ty does not
+  -- suggest yet). Keeping both enabled caused duplicate completion items and
+  -- stacked signature-help popups. ty still provides type checking, inlay
+  -- hints, and navigation.
   vim.lsp.config('ty', {
     on_init = function(client)
       client.server_capabilities.completionProvider = nil
+      client.server_capabilities.signatureHelpProvider = nil
     end,
+    settings = {
+      ty = {
+        -- Inlay hints: variable types + argument names at call sites.
+        inlayHints = { variableTypes = true, callArgumentNames = true },
+        -- Only report diagnostics for open files (fastest in-editor mode).
+        diagnosticMode = 'openFilesOnly',
+      },
+    },
+    -- Let ty use uv for project/environment discovery (uv >= 0.12.3).
+    -- Improves type checking accuracy in uv projects.
+    -- Drop this if it causes issues; it is experimental.
+    init_options = { experimental = { useUv = 'on' } },
   })
   vim.lsp.enable('ty')
 end
@@ -935,6 +962,18 @@ do
   }
 
   vim.keymap.set({ 'n', 'v' }, '<leader>f', function() require('conform').format { async = true } end, { desc = '[F]ormat buffer' })
+
+  -- Format on leaving insert mode (all languages). conform falls back to LSP
+  -- formatting when no external formatter is configured for the filetype, so
+  -- this is a no-op for languages without any formatter.
+  vim.api.nvim_create_autocmd('InsertLeave', {
+    callback = function()
+      local bufnr = vim.api.nvim_get_current_buf()
+      if vim.bo[bufnr].modified then
+        require('conform').format { bufnr = bufnr, async = true }
+      end
+    end,
+  })
 end
 
 -- ============================================================
@@ -1024,9 +1063,25 @@ do
     -- See `:help blink-cmp-config-fuzzy` for more information
     fuzzy = { implementation = 'lua' },
 
-    -- Shows a signature help window while you type arguments for a function
+    -- Signature help window is enabled globally, but disabled for Python via a
+    -- FileType autocmd below (pyright returns every overload of a function,
+    -- e.g. both `print` signatures, which stacked duplicate popups).
     signature = { enabled = true },
   }
+
+  -- Python: disable blink.cmp's auto-triggered signature window. pyright
+  -- returns every overload of a function (e.g. both `print` signatures), which
+  -- stacked duplicate popups. Other languages keep the signature window; in
+  -- Python use `gK` for on-demand signature help instead.
+  -- Uses BufEnter (not FileType) so background buffers (fidget, empty, ...)
+  -- don't reset the global signature state.
+  vim.api.nvim_create_autocmd('BufEnter', {
+    callback = function(args)
+      local buf = args.buf
+      if vim.bo[buf].buftype ~= '' then return end
+      require('blink.cmp.config').signature.trigger.enabled = vim.bo[buf].filetype ~= 'python'
+    end,
+  })
 end
 
 -- ============================================================

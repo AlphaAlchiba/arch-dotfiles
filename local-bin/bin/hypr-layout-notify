@@ -1,0 +1,45 @@
+#!/usr/bin/env python3
+"""Notify when the active keyboard layout changes.
+
+Listens to Hyprland's event socket (activelayout events) and shows a
+notification with the new layout name. XKB layout groups are per-device,
+so every keyboard is tracked; the first event per keyboard (the initial
+layout at startup) is suppressed.
+"""
+
+import json
+import os
+import socket
+import subprocess
+import sys
+
+
+def main():
+    sig = os.environ.get("HYPRLAND_INSTANCE_SIGNATURE")
+    runtime = os.environ.get("XDG_RUNTIME_DIR", f"/run/user/{os.getuid()}")
+    sock_path = os.path.join(runtime, "hypr", sig, ".socket2.sock")
+    if not sig or not os.path.exists(sock_path):
+        sys.exit(f"Hyprland socket not found: {sock_path}")
+
+    seen = set()
+
+    sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+    sock.connect(sock_path)
+    with sock.makefile("r") as events:
+        for line in events:
+            line = line.strip()
+            if not line.startswith("activelayout>>"):
+                continue
+            _, payload = line.split(">>", 1)
+            kb, layout = payload.split(",", 1)
+            if kb in seen:
+                subprocess.run(
+                    ["notify-send", "-t", "1000", "Keyboard Layout", layout],
+                    check=False,
+                )
+            else:
+                seen.add(kb)
+
+
+if __name__ == "__main__":
+    main()

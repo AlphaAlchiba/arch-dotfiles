@@ -106,10 +106,10 @@ hl.config({
 
 hl.config({
 	input = {
-		kb_layout = "us",
-		kb_variant = "",
+		kb_layout = "us,us",
+		kb_variant = ",intl",
 		kb_model = "",
-		kb_options = "",
+		kb_options = "caps:swapescape,grp:ctrl_alt_toggle",
 		kb_rules = "",
 
 		follow_mouse = 1,
@@ -131,11 +131,6 @@ hl.gesture({
 
 -- Example per-device config
 -- See https://wiki.hypr.land/Configuring/Advanced-and-Cool/Devices/ for more
-hl.config({
-	input = {
-		kb_options = "caps:swapescape",
-	},
-})
 
 -- Brain Shell Autostarts
 hl.on("hyprland.start", function()
@@ -145,6 +140,7 @@ hl.on("hyprland.start", function()
 	hl.exec_cmd("systemctl --user import-environment")
 	hl.exec_cmd("systemctl --user start voxtype.service")
 	hl.exec_cmd("awww-daemon")
+	hl.exec_cmd("hypr-layout-notify")
 	hl.exec_cmd("hypridle -c " .. os.getenv("HOME") .. "/.local/src/Brain_Shell/src/config/hypridle.conf")
 	hl.exec_cmd("quickshell -c " .. os.getenv("HOME") .. "/.local/src/Brain_Shell")
 	hl.exec_cmd("systemctl --user start hyprpolkitagent")

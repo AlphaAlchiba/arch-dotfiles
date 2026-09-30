@@ -7,5 +7,4 @@ spotify
 tokyonight-gtk-theme-git
 voxtype-bin
 yay-bin
-yay-bin-debug
 zen-browser-bin

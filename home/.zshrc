@@ -1,4 +1,3 @@
-#!/usr/bin/env bash
 # ~/.zshrc - Modern Zsh Configuration
 
 # --- 1. Completions & Menu ---
@@ -385,7 +384,7 @@ add-zsh-hook chpwd _auto_venv
 
 
 # opencode
-export PATH=/home/alpha/.opencode/bin:$PATH
+export PATH="$HOME/.opencode/bin:$PATH"
 
 # tmux session launchers
 export PATH="$HOME/.local/bin/tmux-sessions:$PATH"

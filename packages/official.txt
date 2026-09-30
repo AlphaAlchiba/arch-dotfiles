@@ -87,6 +87,7 @@ quickshell
 ripgrep
 rtkit
 satty
+shader-slang
 signal-desktop
 slurp
 spice

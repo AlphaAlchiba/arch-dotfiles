@@ -13,3 +13,6 @@ Thumbs.db
 .venv/
 __pycache__/
 node_modules/
+
+# Brain_Shell runtime state (rewritten on every wallpaper change)
+config/Brain_Shell/src/user_data/wallpaper.json

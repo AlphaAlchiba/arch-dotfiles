@@ -72,5 +72,11 @@ vim.keymap.set('n', 'zi', function()
   end
 end, { desc = 'Toggle all folds' })
 
+-- nvim-scrollbar: scrollbar in the sign column with diagnostics and
+-- git change marks (gitsigns handler; search marks would need hlslens)
+vim.pack.add { 'https://github.com/petertriho/nvim-scrollbar' }
+require('scrollbar').setup {}
+-- require('scrollbar.handlers.gitsigns').setup() -- disabled: git marks already shown by gitsigns' sign column
+
 -- Load per-language syntax highlight overrides
 require('custom.highlights')

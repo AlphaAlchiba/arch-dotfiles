@@ -69,6 +69,7 @@ nwg-look
 obsidian
 openssh
 otf-font-awesome
+pacman-contrib
 papirus-icon-theme
 pass
 pavucontrol
@@ -84,6 +85,7 @@ qt6ct
 qt6-declarative
 qt6-multimedia
 quickshell
+rate-mirrors
 ripgrep
 rtkit
 satty

@@ -6,11 +6,12 @@
 #
 # What this does:
 #   1. Installs yay (AUR helper) if missing
-#   2. Installs all packages from packages/official.txt and packages/aur.txt
-#   3. Stows config files into ~/.config with symlinks
-#   4. Clones Brain_Shell to ~/.local/src/Brain_Shell
-#   5. Enables user systemd services (voxtype, cliphist-wipe)
-#   6. Checks for OpenCode API key in ~/.opencode-secrets
+#   2. Ranks mirrors (rate-mirrors) and enables paccache.timer
+#   3. Installs all packages from packages/official.txt and packages/aur.txt
+#   4. Stows config files into ~/.config with symlinks
+#   5. Clones Brain_Shell to ~/.local/src/Brain_Shell
+#   6. Enables user systemd services (voxtype, cliphist-wipe)
+#   7. Checks for OpenCode API key in ~/.opencode-secrets
 #
 # Manual steps required after (see end of script):
 #   - Enable and start system services (docker, firewalld)
@@ -44,6 +45,23 @@ if ! command -v yay &>/dev/null; then
     (cd /tmp/yay-bin && makepkg -si --noconfirm)
     rm -rf /tmp/yay-bin
 fi
+
+# ── 1.5 Pacman hygiene: fast mirrors + cache cleanup ───────────────────────
+# rate-mirrors ranks the mirrorlist before the big package install below,
+# so the install itself uses fast mirrors. Takes a minute or two.
+# Prioritize mirrors from your country:  MIRROR_COUNTRY=DE ./install.sh
+log "Installing pacman-contrib and rate-mirrors..."
+sudo pacman -S --needed --noconfirm pacman-contrib rate-mirrors
+
+log "Ranking mirrors with rate-mirrors (takes a minute or two)..."
+if [[ -n "${MIRROR_COUNTRY:-}" ]]; then
+    rate-mirrors --entry-country "$MIRROR_COUNTRY" arch | sudo tee /etc/pacman.d/mirrorlist >/dev/null
+else
+    rate-mirrors arch | sudo tee /etc/pacman.d/mirrorlist >/dev/null
+fi
+
+log "Enabling paccache.timer (weekly package cache cleanup)..."
+sudo systemctl enable --now paccache.timer
 
 # ── 2. Install all packages ─────────────────────────────────────────────────
 log "Installing official packages..."

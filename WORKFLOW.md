@@ -37,11 +37,13 @@
 ├── local-bin/bin/            ← stowed to ~/.local/bin/
 │   ├── env
 │   ├── env.fish
+│   ├── hypr-layout-notify    ← keyboard layout change notifications
 │   └── tmux-sessions/
 ├── packages/
 │   ├── official.txt                 ← pacman -Qqen
 │   └── aur.txt                      ← pacman -Qqem
 ├── install.sh                       ← fresh-install bootstrap
+├── justfile                         ← management recipes (just install/update/doctor/...)
 ├── README.md                        ← restore guide + keybind reference
 └── WORKFLOW.md                      ← this file
 ```
@@ -245,7 +247,10 @@ cd ~/dotfiles && stow -R -d . -t ~/.config config   # re-link
 
 | Task | Command |
 |---|---|
-| Re-link after `git pull` | `cd ~/dotfiles && stow -R -d . -t ~/.config config` |
+| Re-link after `git pull` | `just stow` (or `cd ~/dotfiles && stow -R -d . -t ~/.config config`) |
+| Pull + re-link | `just update` |
+| Verify system matches repo | `just doctor` |
+| Validate configs | `just check` |
 | Update package lists | `pacman -Qqen \| sort > ~/dotfiles/packages/official.txt` |
 | Load new secrets into shell | `source ~/.opencode-secrets` |
 | Verify symlink target | `ls -la ~/.config/tmux` (should show `-> ../dotfiles/config/tmux`) |

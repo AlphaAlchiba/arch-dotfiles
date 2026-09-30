@@ -25,6 +25,21 @@ cd ~/dotfiles
 ./install.sh
 ```
 
+## Dotfiles Management (just)
+
+The repo ships a `justfile` for day-to-day management — `just` is installed via `packages/official.txt`:
+
+| Recipe | What it does |
+|---|---|
+| `just install` | Full bootstrap (same as `./install.sh`) |
+| `just stow` | Re-link all stow packages |
+| `just update` | `git pull --ff-only` + re-stow |
+| `just packages` | Update all packages (`yay -Syu`) |
+| `just check` | Validate configs (`hyprctl configerrors` + headless nvim load) |
+| `just doctor` | Verify the system matches the repo: git state, symlinks, packages, services, tools |
+
+`just doctor` is the one to run after any change or on a new machine — it exits non-zero and lists everything that drifted.
+
 ## Post-Install Checklist
 
 After `install.sh` completes:
@@ -73,6 +88,7 @@ After `usermod`, log out and back in for the docker group to take effect.
 | `Super + S` | Screenshot region → satty annotation |
 | `Super + Shift + S` | Screenshot window → satty annotation |
 | `Super + P` | Color picker (hyprpicker) |
+| `Ctrl + Alt` | Cycle keyboard layout (US ↔ US International, with notification) |
 | `Super + M` | Toggle Spotify special workspace |
 | `Super + O` | Toggle Obsidian special workspace |
 | `Super + I` | Toggle Signal special workspace |
@@ -296,6 +312,10 @@ Notes on the semantics:
 | `<Space>a` | Toggle aerial outline |
 | `<Space>u` | Toggle undotree |
 | `<Space>q` | Open diagnostic quickfix list |
+| `<Space>xx` | Toggle diagnostics list (Trouble) |
+| `<Space>xX` | Toggle buffer diagnostics (Trouble) |
+| `<Space>xl` | Toggle location list (Trouble) |
+| `<Space>xq` | Toggle quickfix list (Trouble) |
 | `<Space>f` | Format buffer |
 | `<Space>db` | Database UI (Dadbod) |
 | `<Space>dq` | Database query |
@@ -316,6 +336,7 @@ Notes on the semantics:
 - **dadbod SQL completion**: with an active vim-dadbod connection (`:DB` or DBUI), typing in SQL buffers completes table names, column names, and SQL keywords from the connected database's schema (`table.` triggers column completion). Requires a live connection; without one, no completions appear.
 - **mini.move** (`Alt + h/j/k/l`): moves the current line in normal mode, the visual selection in visual mode.
 - **mini.trailspace**: highlights trailing whitespace and strips it automatically on save.
+- **trouble** (`<Space>xx/xX/xl/xq`): quickfix-style panel for LSP diagnostics, loclist, and quickfix. `<Space>xx` shows all workspace diagnostics, `<Space>xX` scopes to the current buffer.
 
 ## Architecture Notes
 
@@ -360,12 +381,19 @@ greetd → tuigreet (login) → Hyprland
   ├── hyprpolkitagent (polkit authentication)
   ├── cliphist        (clipboard history, text + image)
   ├── awww-daemon     (wallpaper daemon)
+  ├── hypr-layout-notify (keyboard layout change notifications)
   └── Brain_Shell     (Quickshell overlay — dashboard, popups, panels)
        ├── Dashboard home, stats, kanban, launcher, config
        ├── Popups: power menu, notifications, clipboard, wallpaper picker
        ├── Network: wifi, bluetooth, VPN
        └── Audio: output, input, mixer
 ```
+
+## Keyboard Layouts
+
+Two layouts are configured: **US English** and **US International** (dead keys for accents). `Ctrl + Alt` (either side) cycles through them — handled by XKB (`grp:ctrl_alt_toggle`), so it works in every app and no modifier keys are consumed. Note that any `Ctrl + Alt` chord (e.g. `Ctrl + Alt + T` in an app) also cycles the layout.
+
+`hypr-layout-notify` (in `local-bin/bin/`) listens to Hyprland's event socket and pops a 1-second notification with the new layout name on every change. It tracks all keyboards (XKB layout groups are per-device) and suppresses the initial startup event.
 
 ## Known Issues
 

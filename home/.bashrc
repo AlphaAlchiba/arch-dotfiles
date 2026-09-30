@@ -9,8 +9,7 @@ alias ls='ls --color=auto'
 alias grep='grep --color=auto'
 PS1='[\u@\h \W]\$ '
 . "$HOME/.cargo/env"
+. "$HOME/.local/bin/env"
 
 # opencode
-export PATH=/home/alpha/.opencode/bin:$PATH
-
-. "$HOME/.local/bin/env"
+export PATH="$HOME/.opencode/bin:$PATH"

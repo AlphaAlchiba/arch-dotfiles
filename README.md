@@ -398,7 +398,6 @@ Two layouts are configured: **US English** and **US International** (dead keys f
 ## Known Issues
 
 - **NVIDIA driver** (`nvidia-open-dkms`): Requires envycontrol to switch between integrated and hybrid mode. The driver may need manual setup. If you don't need the dGPU, remove the package (it rebuilds on every kernel update).
-- **Dual hypridle configs**: Two copies exist — one in `~/.config/hypr/hypridle.conf` (stale) and one in Brain_Shell's source tree. The autostart uses the Brain_Shell copy. The repo only tracks the Brain_Shell version.
 - **`.gitconfig`**: Global git config is managed through dotfiles (stowed). Changes should be made in `~/dotfiles/home/.gitconfig`, not `~/.gitconfig` directly.
 
 ## Color Palette Reference

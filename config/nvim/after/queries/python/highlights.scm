@@ -1,8 +1,9 @@
 ; extends
 
 ; Imported names in `from x import y` — captured as @module.import so they
-; can be colored golden (see lua/custom/highlights/palettes/aura-dracula-spirit.lua),
-; distinct from the module path (django.db -> @module, salmon).
+; can be colored lavender like constructors (a class reference is lavender
+; whether imported or instantiated), distinct from the module path
+; (django.db -> @module, salmon).
 (import_from_statement
   name: (dotted_name (identifier) @module.import))
 
@@ -11,8 +12,9 @@
     name: (dotted_name (identifier) @module.import)
     alias: (identifier) @module.import))
 
-; Attribute objects (models in models.CharField) — golden like the import,
-; so module references are easy to spot. self/cls keep their builtin color.
+; Attribute objects (models in models.CharField) — lavender like imported
+; names and constructors, so module/class references read consistently
+; whether imported or used. self/cls keep their builtin color.
 ((attribute
   object: (identifier) @module.import)
   (#lua-match? @module.import "^[%l_].*$")
@@ -28,8 +30,9 @@
         left: (identifier) @variable))))
   (#lua-match? @variable "^[%l_].*$"))
 
-; Class names and superclasses stay upright — only type annotations are
-; italic (the @type naming-convention capture would italicize them).
+; Class names and superclasses are captured as @type.definition so the
+; @type naming-convention capture doesn't claim them; both are golden
+; italic in the palette, like type annotations.
 (class_definition
   name: (identifier) @type.definition)
 

@@ -16,12 +16,13 @@
 -- - Types and classes (class names, superclasses, type annotations) are
 --   golden #FFCA77 and italic; functions and methods are light orange
 --   #ffca85 and italic. The two families are distinguished by color.
--- - Constructors (CharField(...)) are lavender #c4b5fd, distinct from the
---   golden classes and the light cyan variables.
+-- - Constructors (CharField(...)), imported names, and attribute objects
+--   (models, HttpResponse) are lavender #c4b5fd — a class/module reference
+--   is lavender whether imported or used.
 -- - Variables, parameters, and properties are light cyan #82e2ff
 --   (parameters italic, per the theme's meta.function.parameters).
--- - Module paths and self/cls are salmon #ff8d8d; imported names and
---   attribute access are golden #FFCA77.
+-- - Module paths and self/cls are salmon #ff8d8d; attribute access
+--   (self.title) is golden #FFCA77.
 --
 -- Python-specific: `@module.import` (imported names like `models`) is
 -- captured by after/queries/python/highlights.scm.
@@ -62,8 +63,10 @@ return {
     ['@module'] = '#ff8d8d',
     ['@module.builtin'] = '#ff8d8d',
     ['@namespace'] = '#ff8d8d',
-    -- Imported names (from django.db import models)
-    ['@module.import'] = '#FFCA77',
+    -- Imported names (from django.http import HttpResponse) and attribute
+    -- objects (models in models.CharField): lavender like constructors —
+    -- a class/module reference is lavender whether imported or used
+    ['@module.import'] = '#c4b5fd',
 
     -- Strings
     ['@string'] = '#61ffca',

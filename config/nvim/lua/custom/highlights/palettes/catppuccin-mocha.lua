@@ -33,7 +33,7 @@ return {
     ['@string'] = '#94e2d5',
     ['@string.documentation'] = { fg = '#94e2d5', italic = true },
     ['@string.escape'] = '#f38ba8',
-    ['@string.regex'] = '#f38ba8',
+    ['@string.regexp'] = '#f38ba8',
     ['@string.special'] = '#f38ba8',
     ['@character'] = '#a6e3a1',
 

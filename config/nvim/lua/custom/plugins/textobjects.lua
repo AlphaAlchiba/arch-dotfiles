@@ -17,8 +17,16 @@ local textobjects_config = {
   move = {
     enable = true,
     set_jumps = true,
-    goto_next_start = { [']]'] = '@function.outer' },
-    goto_previous_start = { ['[['] = '@function.outer' },
+    goto_next_start = {
+      [']]'] = '@function.outer',
+      [']C'] = '@class.outer', -- ]c is taken by gitsigns (hunks)
+      [']a'] = '@parameter.outer',
+    },
+    goto_previous_start = {
+      ['[['] = '@function.outer',
+      ['[C'] = '@class.outer',
+      ['[a'] = '@parameter.outer',
+    },
   },
 }
 

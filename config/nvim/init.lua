@@ -842,8 +842,6 @@ do
   -- You can press `g?` for help in this menu.
   local ensure_installed = vim.tbl_keys(servers or {})
   vim.list_extend(ensure_installed, {
-    -- LSP servers (keys from `servers` table are already included above)
-    'ts_ls',
     -- Formatters
     'biome',         -- JSON, JS, TS, CSS (format + lint)
     'prettierd',     -- YAML, HTML, Markdown
@@ -865,15 +863,45 @@ do
     vim.lsp.enable(name)
   end
 
-  -- Restart Python LSP clients on save so environment changes (e.g.
-  -- `uv add pandas` in another pane) are picked up without restarting
-  -- Neovim. Scoped to Python: restarting e.g. ts_ls or clangd on every
-  -- save would be too slow.
+  -- Restart Python LSP clients only when the environment changed (e.g.
+  -- `uv add pandas` in another pane), not on every save: pyright takes
+  -- seconds to re-index, so restarting per save leaves the buffer without
+  -- diagnostics/completions after each write.
+  local env_markers = { 'pyproject.toml', 'uv.lock', 'requirements.txt', 'pyvenv.cfg' }
+  local env_mtime_by_buf = {}
+
+  local function python_env_mtime(bufnr)
+    local root = vim.fs.root(bufnr, env_markers)
+    if not root then return 0 end
+    local latest = 0
+    for _, name in ipairs(env_markers) do
+      local stat = vim.uv.fs_stat(vim.fs.joinpath(root, name))
+      if stat then latest = math.max(latest, stat.mtime.sec) end
+    end
+    local venv = vim.uv.fs_stat(vim.fs.joinpath(root, '.venv'))
+    if venv then latest = math.max(latest, venv.mtime.sec) end
+    return latest
+  end
+
+  -- Record the environment state when entering a python buffer
+  vim.api.nvim_create_autocmd('BufEnter', {
+    desc = 'Record python environment state',
+    group = vim.api.nvim_create_augroup('kickstart-lsp-env-track', { clear = true }),
+    callback = function(args)
+      if vim.bo[args.buf].filetype == 'python' then
+        env_mtime_by_buf[args.buf] = python_env_mtime(args.buf)
+      end
+    end,
+  })
+
   vim.api.nvim_create_autocmd('BufWritePost', {
-    desc = 'Restart Python LSP clients after save',
-    group = vim.api.nvim_create_augroup('kickstart-lsp-restart-on-save', { clear = true }),
+    desc = 'Restart Python LSP clients when the environment changed',
+    group = vim.api.nvim_create_augroup('kickstart-lsp-restart-on-env-change', { clear = true }),
     callback = function(args)
       if vim.bo[args.buf].filetype ~= 'python' then return end
+      local mtime = python_env_mtime(args.buf)
+      if mtime == 0 or mtime == env_mtime_by_buf[args.buf] then return end
+      env_mtime_by_buf[args.buf] = mtime
       local names = {}
       for _, client in ipairs(vim.lsp.get_clients { bufnr = args.buf }) do
         names[client.name] = true

@@ -141,6 +141,10 @@ return {
 
     -- Attributes (decorators italic)
     ['@attribute'] = { fg = '#f694ff', italic = true },
+    -- Builtin decorators (property/classmethod/staticmethod) — without
+    -- this, Neovim's default link (@attribute.builtin -> Special) renders
+    -- them light pink instead of the palette pink
+    ['@attribute.builtin'] = { fg = '#f694ff', italic = true },
     ['@tag.attribute'] = '#f694ff',
 
     -- Punctuation

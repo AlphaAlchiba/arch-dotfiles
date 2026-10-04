@@ -12,6 +12,11 @@
     name: (dotted_name (identifier) @module.import)
     alias: (identifier) @module.import))
 
+; `from __future__ import annotations` — same lavender treatment for the
+; imported name (the base query only colors the module path).
+(future_import_statement
+  name: (dotted_name (identifier) @module.import))
+
 ; Attribute objects (models in models.CharField) — lavender like imported
 ; names and constructors, so module/class references read consistently
 ; whether imported or used. self/cls keep their builtin color.
@@ -45,9 +50,22 @@
     (attribute
       attribute: (identifier) @type.definition)))
 
+; Generic type containers (defaultdict[str, int]) — the base query only
+; covers `subscript`, not the newer `generic_type` node, so the container
+; name would render as a plain variable; make it a type like its parameters.
+(generic_type
+  (identifier) @type)
+
 ; Guarantee constructor calls (models.CharField(...)) render as @constructor
 ; — appended last so it wins over @type/@variable regardless of query order.
 ((call
   function: (attribute
     attribute: (identifier) @constructor))
   (#lua-match? @constructor "^%u"))
+
+; The base query sets priority 101 for the decorator @, lower than the
+; default 120, so the @operator capture wins and the @ renders violet.
+; Re-set it higher so decorators read uniformly pink.
+((decorator
+  "@" @attribute)
+  (#set! priority 150))

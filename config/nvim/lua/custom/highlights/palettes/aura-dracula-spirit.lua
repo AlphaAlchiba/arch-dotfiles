@@ -77,8 +77,8 @@ return {
 
     -- Numbers: muted orange — softer than the burning orange, still distinct
     -- from the light function orange and the string mint
-    ['@number'] = '#ff9e64',
-    ['@number.float'] = '#ff9e64',
+    ['@number'] = '#e8935f',
+    ['@number.float'] = '#e8935f',
     -- Booleans: pink, their own distinctive color
     ['@boolean'] = '#f694ff',
 

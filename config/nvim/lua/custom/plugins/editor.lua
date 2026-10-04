@@ -17,18 +17,8 @@ require('aerial').setup {
   -- Show context for all buffers, not just current
   manage_folds = true,
 }
-
--- Distinct Catppuccin Mocha colors per symbol type in the aerial outline
-local aerial_colors = {
-  AerialClass    = { fg = '#f9e2af' }, -- yellow
-  AerialFunction = { fg = '#89b4fa' }, -- blue
-  AerialMethod   = { fg = '#a6e3a1' }, -- green
-  AerialVariable = { fg = '#fab387' }, -- peach
-  AerialField    = { fg = '#94e2d5' }, -- teal
-}
-for group, opts in pairs(aerial_colors) do
-  vim.api.nvim_set_hl(0, group, opts)
-end
+-- Aerial* highlight colors are defined by the active text palette
+-- (lua/custom/highlights/palettes/*.lua)
 
 vim.keymap.set('n', '<leader>a', require('aerial').toggle, { desc = 'Toggle aerial (code outline)' })
 

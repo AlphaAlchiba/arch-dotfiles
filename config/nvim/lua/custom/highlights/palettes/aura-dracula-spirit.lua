@@ -2,7 +2,7 @@
 --
 -- Based on the "Aura Dracula Spirit" VSCode theme by JoseMurilloc
 -- (https://github.com/JoseMurilloc/aura-spirit-dracula), plus custom
--- textMateRules: namespace #ff8d8d, constants #c9c5ff, classes #FFCA77,
+-- textMateRules: namespace #ff8d8d, constants #c9c5ff, classes #d8a657,
 -- variables/properties/parameters #82e2ff.
 --
 -- Applied on top of the catppuccin-mocha colorscheme: only code text colors
@@ -14,15 +14,20 @@
 --
 -- Design notes:
 -- - Types and classes (class names, superclasses, type annotations) are
---   golden #FFCA77 and italic; functions and methods are light orange
---   #ffca85 and italic. The two families are distinguished by color.
+--   deep gold #d8a657 and italic; functions and methods are light orange
+--   #ffca85 and italic. The two families are distinguished by color:
+--   types are deeper and more muted, functions are bright peach.
+-- - Keywords and control flow are violet #a277ff; @keyword.repeat and
+--   @keyword.conditional are set explicitly because current treesitter
+--   queries capture for/while/if/else under those names, not the legacy
+--   @repeat/@conditional.
 -- - Constructors (CharField(...)), imported names, and attribute objects
 --   (models, HttpResponse) are lavender #c4b5fd — a class/module reference
 --   is lavender whether imported or used.
 -- - Variables, parameters, and properties are light cyan #82e2ff
 --   (parameters italic, per the theme's meta.function.parameters).
 -- - Module paths and self/cls are salmon #ff8d8d; attribute access
---   (self.title) is golden #FFCA77.
+--   (self.title) is deep gold #d8a657.
 --
 -- Python-specific: `@module.import` (imported names like `models`) is
 -- captured by after/queries/python/highlights.scm.
@@ -49,6 +54,8 @@ return {
     ['@keyword.modifier'] = '#a277ff',
     ['@keyword.debug'] = '#a277ff',
     ['@keyword.directive'] = '#a277ff',
+    ['@keyword.repeat'] = '#a277ff',
+    ['@keyword.conditional'] = '#a277ff',
     ['@conditional'] = '#a277ff',
     ['@repeat'] = '#a277ff',
     ['@include'] = '#a277ff',
@@ -98,14 +105,15 @@ return {
     ['@function.macro'] = { fg = '#ffca85', italic = true },
     ['@macro'] = { fg = '#ffca85', italic = true },
 
-    -- Types and classes: golden, italic — class names, superclasses, and
-    -- type annotations share the golden (same as the member/import golden),
-    -- and the whole type family is italic like the function family.
-    ['@type'] = { fg = '#FFCA77', italic = true },
-    ['@type.builtin'] = { fg = '#FFCA77', italic = true },
-    ['@type.definition'] = { fg = '#FFCA77', italic = true },
-    ['@type.qualifier'] = { fg = '#FFCA77', italic = true },
-    -- Constructors (CharField(...)): lavender — distinct from golden
+    -- Types and classes: deep gold, italic — class names, superclasses, and
+    -- type annotations share the deep gold (same as the member gold), and
+    -- the whole type family is italic like the function family. Deeper and
+    -- more muted than the peach functions so the two families read apart.
+    ['@type'] = { fg = '#d8a657', italic = true },
+    ['@type.builtin'] = { fg = '#d8a657', italic = true },
+    ['@type.definition'] = { fg = '#d8a657', italic = true },
+    ['@type.qualifier'] = { fg = '#d8a657', italic = true },
+    -- Constructors (CharField(...)): lavender — distinct from deep gold
     -- classes, light cyan variables, and the light orange functions
     ['@constructor'] = '#c4b5fd',
     ['@structure'] = '#c4b5fd',
@@ -118,8 +126,8 @@ return {
     -- Properties and fields
     ['@property'] = '#82e2ff',
     ['@field'] = '#82e2ff',
-    -- Attribute access (models.something, self.x): golden
-    ['@variable.member'] = '#FFCA77',
+    -- Attribute access (models.something, self.x): deep gold, like types
+    ['@variable.member'] = '#d8a657',
 
     -- Attributes (decorators italic)
     ['@attribute'] = { fg = '#f694ff', italic = true },
@@ -138,16 +146,16 @@ return {
     ['@error'] = '#ff6767',
   },
   rainbow = {
-    '#ff6767', -- red
+    '#f7768e', -- rose (not the error red #ff6767)
     '#ffca85', -- yellow
     '#82e2ff', -- blue
     '#f694ff', -- orange (pink slot for distinctness)
     '#61ffca', -- green
     '#a277ff', -- violet
-    '#76d4FF', -- cyan
+    '#7aa2f7', -- blue (not the variable cyan #82e2ff)
   },
   aerial = {
-    Class = '#FFCA77',
+    Class = '#d8a657',
     Function = '#ffca85',
     Method = '#ffca85',
     Variable = '#82e2ff',

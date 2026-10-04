@@ -14,12 +14,12 @@
 local default_palette = 'aura-dracula-spirit'
 
 -- LSP semantic tokens (priority 125) override treesitter (priority 120), so
--- pyright etc. would wash out palette colors: Neovim's default links map
--- @lsp.type.* to treesitter groups, but catppuccin overrides some of them
--- (e.g. @lsp.type.variable = {} renders variables uncolored). Re-link
--- explicitly so semantic tokens render with the active palette's colors.
--- Class names link to @type.definition (upright) and type annotations to
--- @type (italic), matching the treesitter captures.
+-- an LSP that sends tokens (e.g. basedpyright) would wash out palette
+-- colors: Neovim's default links map @lsp.type.* to treesitter groups, but
+-- catppuccin overrides some of them (e.g. @lsp.type.variable = {} renders
+-- variables uncolored). Re-link explicitly so semantic tokens render with
+-- the active palette's colors. Class names link to @type.definition and
+-- type annotations to @type, matching the treesitter captures.
 local lsp_type_links = {
   ['@lsp.type.class'] = '@type.definition',
   ['@lsp.type.comment'] = '@comment',
@@ -85,10 +85,14 @@ local function apply_palette(name)
     vim.api.nvim_set_hl(0, group, opts)
   end
 
-  -- The highlighter resolves captures as @capture.<lang>; undefined
-  -- @capture.<lang> groups fall back to @capture, but catppuccin defines
-  -- some explicitly (e.g. @constructor.python = sky) which would override
-  -- the palette. Re-link them to the palette's groups.
+  -- Catppuccin compatibility: the treesitter highlighter resolves captures
+  -- as @capture.<lang> (e.g. @constructor.python), not @capture. Undefined
+  -- @capture.<lang> groups fall back to @capture, but catppuccin v4 defines
+  -- some explicitly — @constructor.python = sky (#89dceb) and
+  -- @constructor.lua — which overrode the palette's @constructor color
+  -- (CharField rendered light blue instead of the palette color). Re-link
+  -- them to @constructor so they follow the active palette. If catppuccin
+  -- adds more <lang>-specific overrides, add them here.
   for _, group in ipairs({ '@constructor.python', '@constructor.lua' }) do
     vim.api.nvim_set_hl(0, group, { link = '@constructor' })
   end

@@ -12,6 +12,17 @@
 -- fg + style attributes. `rainbow` lists the 7 rainbow-delimiter colors in
 -- order. `aerial` maps aerial outline symbol types to colors.
 --
+-- Design notes:
+-- - Types and classes (class names, superclasses, type annotations) are
+--   golden #FFCA77 and italic; functions and methods are light orange
+--   #ffca85 and italic. The two families are distinguished by color.
+-- - Constructors (CharField(...)) are lavender #c4b5fd, distinct from the
+--   golden classes and the light cyan variables.
+-- - Variables, parameters, and properties are light cyan #82e2ff
+--   (parameters italic, per the theme's meta.function.parameters).
+-- - Module paths and self/cls are salmon #ff8d8d; imported names and
+--   attribute access are golden #FFCA77.
+--
 -- Python-specific: `@module.import` (imported names like `models`) is
 -- captured by after/queries/python/highlights.scm.
 
@@ -68,35 +79,33 @@ return {
     -- Booleans: pink, their own distinctive color
     ['@boolean'] = '#f694ff',
 
-    -- Named constants: muted lavender — subdued so it doesn't compete with
-    -- classes/functions, but more saturated than the original #c9c5ff
+    -- Named constants: lavender — subdued so it doesn't compete with
+    -- classes/functions, but more saturated than the original #c9c5ff.
+    -- Constructors share this lavender (see below).
     ['@constant'] = '#c4b5fd',
     ['@constant.builtin'] = '#c4b5fd',
     ['@constant.macro'] = '#c4b5fd',
 
-    -- Functions and methods
-    ['@function'] = '#ffca85',
-    ['@function.call'] = '#ffca85',
-    ['@function.method'] = '#ffca85',
-    ['@function.method.call'] = '#ffca85',
-    ['@function.builtin'] = '#ffca85',
-    ['@function.macro'] = '#ffca85',
-    ['@macro'] = '#ffca85',
+    -- Functions and methods: light orange, italic like class names
+    ['@function'] = { fg = '#ffca85', italic = true },
+    ['@function.call'] = { fg = '#ffca85', italic = true },
+    ['@function.method'] = { fg = '#ffca85', italic = true },
+    ['@function.method.call'] = { fg = '#ffca85', italic = true },
+    ['@function.builtin'] = { fg = '#ffca85', italic = true },
+    ['@function.macro'] = { fg = '#ffca85', italic = true },
+    ['@macro'] = { fg = '#ffca85', italic = true },
 
-    -- Types and classes: class names golden (same as constructors and the
-    -- member/import golden, per the original theme where classes and
-    -- constructor references share a color), type annotations muted pink —
-    -- distinct from class names, the light function orange, and the vivid
-    -- pink booleans. Class names, annotations, and function names are all
-    -- upright for a consistent look.
-    ['@type'] = '#d98cb3',
-    ['@type.builtin'] = '#d98cb3',
-    ['@type.definition'] = '#FFCA77',
-    ['@type.qualifier'] = '#d98cb3',
-    -- Constructors (CharField(...)): golden like class names — clearly
-    -- distinct from the light cyan variables
-    ['@constructor'] = '#FFCA77',
-    ['@structure'] = '#FFCA77',
+    -- Types and classes: golden, italic — class names, superclasses, and
+    -- type annotations share the golden (same as the member/import golden),
+    -- and the whole type family is italic like the function family.
+    ['@type'] = { fg = '#FFCA77', italic = true },
+    ['@type.builtin'] = { fg = '#FFCA77', italic = true },
+    ['@type.definition'] = { fg = '#FFCA77', italic = true },
+    ['@type.qualifier'] = { fg = '#FFCA77', italic = true },
+    -- Constructors (CharField(...)): lavender — distinct from golden
+    -- classes, light cyan variables, and the light orange functions
+    ['@constructor'] = '#c4b5fd',
+    ['@structure'] = '#c4b5fd',
 
     -- Variables and parameters: light cyan (parameters italic, per the
     -- theme's meta.function.parameters)

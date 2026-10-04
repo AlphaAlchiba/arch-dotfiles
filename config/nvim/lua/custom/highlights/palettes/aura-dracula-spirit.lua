@@ -2,7 +2,7 @@
 --
 -- Based on the "Aura Dracula Spirit" VSCode theme by JoseMurilloc
 -- (https://github.com/JoseMurilloc/aura-spirit-dracula), plus custom
--- textMateRules: namespace #ff8d8d, constants #c9c5ff, classes #FFCA7B,
+-- textMateRules: namespace #ff8d8d, constants #c9c5ff, classes #FFCA77,
 -- variables/properties/parameters #82e2ff.
 --
 -- Applied on top of the catppuccin-mocha colorscheme: only code text colors
@@ -83,16 +83,20 @@ return {
     ['@function.macro'] = '#ffca85',
     ['@macro'] = '#ffca85',
 
-    -- Types and classes (italic = type annotations, per the theme's
-    -- meta.type.annotation / meta.return.type; class names stay upright)
-    ['@type'] = { fg = '#FFCA7B', italic = true },
-    ['@type.builtin'] = { fg = '#FFCA7B', italic = true },
-    ['@type.definition'] = '#FFCA7B',
-    ['@type.qualifier'] = { fg = '#FFCA7B', italic = true },
-    -- Constructors (CharField(...)): dark cyan — clearly distinct from the
-    -- light cyan variables
-    ['@constructor'] = '#0891b2',
-    ['@structure'] = '#0891b2',
+    -- Types and classes: class names golden (same as constructors and the
+    -- member/import golden, per the original theme where classes and
+    -- constructor references share a color), type annotations muted pink —
+    -- distinct from class names, the light function orange, and the vivid
+    -- pink booleans. Class names, annotations, and function names are all
+    -- upright for a consistent look.
+    ['@type'] = '#d98cb3',
+    ['@type.builtin'] = '#d98cb3',
+    ['@type.definition'] = '#FFCA77',
+    ['@type.qualifier'] = '#d98cb3',
+    -- Constructors (CharField(...)): golden like class names — clearly
+    -- distinct from the light cyan variables
+    ['@constructor'] = '#FFCA77',
+    ['@structure'] = '#FFCA77',
 
     -- Variables and parameters: light cyan (parameters italic, per the
     -- theme's meta.function.parameters)
@@ -131,7 +135,7 @@ return {
     '#76d4FF', -- cyan
   },
   aerial = {
-    Class = '#FFCA7B',
+    Class = '#FFCA77',
     Function = '#ffca85',
     Method = '#ffca85',
     Variable = '#82e2ff',

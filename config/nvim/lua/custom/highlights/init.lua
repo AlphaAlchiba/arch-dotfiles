@@ -13,6 +13,39 @@
 
 local default_palette = 'aura-dracula-spirit'
 
+-- LSP semantic tokens (priority 125) override treesitter (priority 120), so
+-- pyright etc. would wash out palette colors: Neovim's default links map
+-- @lsp.type.* to treesitter groups, but catppuccin overrides some of them
+-- (e.g. @lsp.type.variable = {} renders variables uncolored). Re-link
+-- explicitly so semantic tokens render with the active palette's colors.
+-- Class names link to @type.definition (upright) and type annotations to
+-- @type (italic), matching the treesitter captures.
+local lsp_type_links = {
+  ['@lsp.type.class'] = '@type.definition',
+  ['@lsp.type.comment'] = '@comment',
+  ['@lsp.type.decorator'] = '@attribute',
+  ['@lsp.type.enum'] = '@type.definition',
+  ['@lsp.type.enumMember'] = '@constant',
+  ['@lsp.type.event'] = '@type.definition',
+  ['@lsp.type.function'] = '@function',
+  ['@lsp.type.interface'] = '@type',
+  ['@lsp.type.keyword'] = '@keyword',
+  ['@lsp.type.macro'] = '@macro',
+  ['@lsp.type.method'] = '@function.method',
+  ['@lsp.type.modifier'] = '@type.qualifier',
+  ['@lsp.type.namespace'] = '@module',
+  ['@lsp.type.number'] = '@number',
+  ['@lsp.type.operator'] = '@operator',
+  ['@lsp.type.parameter'] = '@variable.parameter',
+  ['@lsp.type.property'] = '@property',
+  ['@lsp.type.regexp'] = '@string.regexp',
+  ['@lsp.type.string'] = '@string',
+  ['@lsp.type.struct'] = '@structure',
+  ['@lsp.type.type'] = '@type',
+  ['@lsp.type.typeParameter'] = '@type.qualifier',
+  ['@lsp.type.variable'] = '@variable',
+}
+
 local palettes_dir = vim.fs.joinpath(vim.fn.stdpath 'config', 'lua', 'custom', 'highlights', 'palettes')
 
 local function palette_names()
@@ -69,6 +102,11 @@ local function apply_palette(name)
   -- Aerial outline groups
   for group, color in pairs(palette.aerial) do
     vim.api.nvim_set_hl(0, 'Aerial' .. group, { fg = color })
+  end
+
+  -- LSP semantic tokens: link to the palette's treesitter groups
+  for group, link in pairs(lsp_type_links) do
+    vim.api.nvim_set_hl(0, group, { link = link })
   end
 
   vim.g.active_text_palette = name

@@ -85,6 +85,14 @@ local function apply_palette(name)
     vim.api.nvim_set_hl(0, group, opts)
   end
 
+  -- The highlighter resolves captures as @capture.<lang>; undefined
+  -- @capture.<lang> groups fall back to @capture, but catppuccin defines
+  -- some explicitly (e.g. @constructor.python = sky) which would override
+  -- the palette. Re-link them to the palette's groups.
+  for _, group in ipairs({ '@constructor.python', '@constructor.lua' }) do
+    vim.api.nvim_set_hl(0, group, { link = '@constructor' })
+  end
+
   -- Rainbow delimiter groups (7 colors, in order)
   local rainbow_groups = {
     'RainbowDelimiterRed',

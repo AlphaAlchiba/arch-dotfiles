@@ -748,22 +748,15 @@ do
   ---@type table<string, vim.lsp.Config>
   local servers = {
     clangd = {},
-    -- pyright: completions ONLY (type checking off). ty handles type checking
-    -- and inlay hints. pyright is required because ty does not yet implement
-    -- "magic method" completions: typing `def __` inside a class body suggests
-    -- nothing in ty, while pyright suggests __init__, __str__, __repr__, etc.
-    -- pyright's inlay hints are disabled below to avoid duplicates with ty's.
+    -- pyright: type checking + completions + inlay hints. ruff handles linting.
     pyright = {
       settings = {
         python = {
           analysis = {
-            typeCheckingMode = 'off',
+            typeCheckingMode = 'standard',
           },
         },
       },
-      on_init = function(client)
-        client.server_capabilities.inlayHintProvider = nil
-      end,
     },
     rust_analyzer = {},
 
@@ -867,31 +860,25 @@ do
     vim.lsp.enable(name)
   end
 
-  -- Astral ty: Python type checker + inlay hints (install via `uv tool install ty`)
-  -- ty's completions and signature help are disabled because pyright provides
-  -- them (including magic methods like __init__/__str__, which ty does not
-  -- suggest yet). Keeping both enabled caused duplicate completion items and
-  -- stacked signature-help popups. ty still provides type checking, inlay
-  -- hints, and navigation.
-  vim.lsp.config('ty', {
-    on_init = function(client)
-      client.server_capabilities.completionProvider = nil
-      client.server_capabilities.signatureHelpProvider = nil
+  -- Restart Python LSP clients on save so environment changes (e.g.
+  -- `uv add pandas` in another pane) are picked up without restarting
+  -- Neovim. Scoped to Python: restarting e.g. ts_ls or clangd on every
+  -- save would be too slow.
+  vim.api.nvim_create_autocmd('BufWritePost', {
+    desc = 'Restart Python LSP clients after save',
+    group = vim.api.nvim_create_augroup('kickstart-lsp-restart-on-save', { clear = true }),
+    callback = function(args)
+      if vim.bo[args.buf].filetype ~= 'python' then return end
+      local names = {}
+      for _, client in ipairs(vim.lsp.get_clients { bufnr = args.buf }) do
+        names[client.name] = true
+        client:stop(true) -- force stop so the restart below isn't skipped
+      end
+      for name in pairs(names) do
+        vim.lsp.enable(name, true)
+      end
     end,
-    settings = {
-      ty = {
-        -- Inlay hints: variable types + argument names at call sites.
-        inlayHints = { variableTypes = true, callArgumentNames = true },
-        -- Only report diagnostics for open files (fastest in-editor mode).
-        diagnosticMode = 'openFilesOnly',
-      },
-    },
-    -- Let ty use uv for project/environment discovery (uv >= 0.12.3).
-    -- Improves type checking accuracy in uv projects.
-    -- Drop this if it causes issues; it is experimental.
-    init_options = { experimental = { useUv = 'on' } },
   })
-  vim.lsp.enable('ty')
 end
 
 -- ============================================================

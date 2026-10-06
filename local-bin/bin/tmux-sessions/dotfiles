@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+
+SESSION="dotfiles"
+ROOT="$HOME/dotfiles/"
+
+# Detect terminal size so we can set window dimensions BEFORE splitting.
+# This prevents tmux from distributing the attach-resize delta evenly,
+# which would destroy -l percentage proportions.
+COLS=$(tput cols)
+ROWS=$(tput lines)
+
+tmux has-session -t "$SESSION" 2>/dev/null
+
+if [ $? != 0 ]; then
+  # ── Window: dotfiles ───────────────────────────────────────
+  tmux new-session -d -s "$SESSION" -n "dotfiles" -c "$ROOT"
+  tmux resize-window -t "$SESSION:dotfiles" -x "$COLS" -y "$ROWS"
+  tmux send-keys -t "$SESSION:dotfiles.1" "nvim" C-m
+  sleep 0.5   # let nvim finish startup before split
+  tmux split-window -h -l 30% -t "$SESSION:dotfiles" -c "$ROOT"
+  tmux send-keys -t "$SESSION:dotfiles.2" "opencode" C-m
+  sleep 0.5   # let opencode settle before next split
+  tmux split-window -v -l 20% -t "$SESSION:dotfiles.1" -c "$ROOT"
+  sleep 1.5  # let terminal settle before select-pane triggers focus event
+  tmux select-pane -t "$SESSION:dotfiles.1"
+fi
+
+tmux attach -t "$SESSION"

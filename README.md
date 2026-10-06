@@ -215,7 +215,7 @@ Notes on the semantics:
 - **Status line**: `status-left`/`status-right` are emptied because vim-tpipeline injects nvim's lualine status through named pipes at runtime (see Architecture Notes). Session names are shown by the `window-status` format via `window_start_flag` — the window flagged as a session's start window gets a `#S` chip (`bg=#181825`/`fg=#FAB387`) prepended, so each session shows its name without needing `status-left`. The flag itself is applied to a session's start window outside the tracked config. Pane borders use `fg=colour234` (near-base) with heavy lines to blend into the background.
 - **Global key handlers**: `Ctrl+h/j/k/l` and `Ctrl+\` navigate panes, but an `is_vim` check (process running in the focused pane) passes the key through to vim instead — synchronized with vim-tmux-navigator on the nvim side (see Architecture Notes). `Ctrl+Backspace` and `Shift+Enter` are forwarded as CSI-u passthroughs (`\e[127;5u` and `S-Enter`) so apps receive them.
 - **Popups** use rounded borders and open `-E` (a command that exits with the popup) sized 75–90% of the window, most in the pane's current directory.
-- **Session workflow — no TPM**: TPM/resurrect/continuum are disabled (commented out in the config). Sessions are instead deterministic scripts in `~/.local/bin/tmux-sessions/` (`tmux-template`, `ideavault`; the directory is on `PATH` via `.zshrc`): each is idempotent (`has-session` check), builds the full layout on first run — per-project windows with an nvim pane, a 30% opencode pane, and a 20% utility pane, root-level windows moved to indices 8–9, start window selected — then attaches. The `tms` (fzf session switcher) and `tmn` (new session) zsh functions handle switching/creating from the shell.
+- **Session workflow — no TPM**: TPM/resurrect/continuum are disabled (commented out in the config). Sessions are instead deterministic scripts in `~/.local/bin/tmux-sessions/` (`tmux-template`, `ideavault`, `dotfiles`; the directory is on `PATH` via `.zshrc`): each is idempotent (`has-session` check), builds the full layout on first run — per-project windows with an nvim pane, a 30% opencode pane, and a 20% utility pane, root-level windows moved to indices 8–9, start window selected — then attaches. The `tms` (fzf session switcher) and `tmn` (new session) zsh functions handle switching/creating from the shell.
 
 ### Neovim (leader = `Space`)
 
@@ -369,7 +369,7 @@ Three layers must stay synchronized:
 
 ### Session Persistence
 
-- **tmux**: TPM/resurrect/continuum are disabled. Deterministic `tmux-sessions` scripts (`tmux-template`, `ideavault`) recreate the full session layout on demand — windows, panes, and the nvim/opencode processes they start. Re-running a script is idempotent: it attaches to the existing session or rebuilds it.
+- **tmux**: TPM/resurrect/continuum are disabled. Deterministic `tmux-sessions` scripts (`tmux-template`, `ideavault`, `dotfiles`) recreate the full session layout on demand — windows, panes, and the nvim/opencode processes they start. Re-running a script is idempotent: it attaches to the existing session or rebuilds it.
 - **persistence.nvim** saves/restores nvim sessions per-project
 - **nvim-pack-lock.json** pins all plugin versions for reproducible restoration
 

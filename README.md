@@ -138,6 +138,8 @@ After `usermod`, log out and back in for the docker group to take effect.
 | `prefix + w` | Choose window |
 | `prefix + C` | Kill window (no confirmation) |
 | `prefix + n` / `prefix + p` | Next / previous window (repeatable) |
+| `prefix + M-h` / `prefix + M-l` | Swap window with previous / next (repeatable, wraps around) |
+| `prefix + .` | Move current window to a specific index (prompt) |
 
 Windows are 1-based and renumber automatically when one is killed (`renumber-windows on`).
 

@@ -69,6 +69,7 @@ nwg-look
 obsidian
 openssh
 otf-font-awesome
+otf-monaspace
 pacman-contrib
 papirus-icon-theme
 pass

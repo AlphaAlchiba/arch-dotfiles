@@ -289,6 +289,50 @@ tmn() {
   fi
 }
 
+# Kill a tmux session (fzf): tmk
+#   - Lists sessions with window count, attach state and creation time
+#   - Preview shows the session's windows and its active pane
+#   - Asks for confirmation before killing
+#   - If the current session is selected, switches to another session first
+tmk() {
+  if ! tmux has-session 2>/dev/null; then
+    echo "No tmux sessions found."
+    return 1
+  fi
+  local fmt="#{session_name}"$'\t'"#{session_windows} windows"$'\t'
+  fmt+="#{?session_attached,attached,detached}"$'\t'"created #{t/p:session_created}"
+  local selection session current
+  selection=$(tmux list-sessions -F "$fmt" 2>/dev/null | \
+    fzf --prompt="✗ kill tmux > " \
+      --header="enter: kill · esc: cancel" \
+      --height=40% --layout=reverse --border --tabstop=4 \
+      --delimiter=$'\t' --with-nth=1,2,3,4 \
+      --color=prompt:#f38ba8,pointer:#f38ba8,hl:#f38ba8,header:#f38ba8 \
+      --preview="tmux list-windows -t {1} -F '  #{?window_active,▶ ,  }#{window_index}: #{window_name} (#{window_panes} panes)' 2>/dev/null; echo; tmux capture-pane -ep -S -20 -t {1} 2>/dev/null" \
+      --preview-window=right:55%:wrap)
+  [[ -z "$selection" ]] && return 0
+  session=${selection%%$'\t'*}
+
+  if ! read -q "?Kill session '$session'? [y/N] "; then
+    echo
+    return 0
+  fi
+  echo
+
+  # Killing the attached session would take this shell down with it — move the
+  # client to another session first (no-op when it is the last one).
+  if [[ -n "$TMUX" ]]; then
+    current=$(tmux display-message -p '#S' 2>/dev/null)
+    [[ "$session" == "$current" ]] && tmux switch-client -n 2>/dev/null
+  fi
+
+  if tmux kill-session -t "$session" 2>/dev/null; then
+    printf '\033[38;2;243;139;168m✗ killed session %s\033[0m\n' "$session"
+  else
+    printf '\033[38;2;243;139;168m✗ session %s is already gone\033[0m\n' "$session"
+  fi
+}
+
 # --- 7. Hardware/App Integration ---
 if [[ "$TERM" != "linux" ]]; then
   # Report cwd via OSC7 so Kitty can open new tabs/windows in the same directory

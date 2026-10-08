@@ -132,21 +132,21 @@ hl.gesture({
 -- Example per-device config
 -- See https://wiki.hypr.land/Configuring/Advanced-and-Cool/Devices/ for more
 
--- Brain Shell Autostarts
+-- Personal autostarts.
+-- Brain Shell's own autostarts (quickshell, awww-daemon, hyprpolkitagent,
+-- cliphist) come from ~/.config/Brain_Shell/hypr/brain-shell.lua, sourced at
+-- the bottom of this file. Do not start them here as well: a second quickshell
+-- instance reserves a second top strut and pushes windows down.
 hl.on("hyprland.start", function()
 	-- Import the session environment and start the voxtype daemon.
 	-- graphical-session.target refuses manual start (RefuseManualStart=yes)
 	-- and no session manager (uwsm) is installed, so start the service directly.
 	hl.exec_cmd("systemctl --user import-environment")
 	hl.exec_cmd("systemctl --user start voxtype.service")
-	hl.exec_cmd("awww-daemon")
 	hl.exec_cmd("hypr-layout-notify")
 	hl.exec_cmd("hypridle -c " .. os.getenv("HOME") .. "/.local/src/Brain_Shell/src/config/hypridle.conf")
-	hl.exec_cmd("quickshell -c " .. os.getenv("HOME") .. "/.local/src/Brain_Shell")
-	hl.exec_cmd("systemctl --user start hyprpolkitagent")
-	hl.exec_cmd("wl-paste --type text --watch cliphist store")
-	hl.exec_cmd("wl-paste --type image --watch cliphist store")
 end)
 
--- Brain_ShellKeybinds
-dofile("/home/alpha/.config/Brain_Shell/Brain_ShellKeybinds.lua")
+-- >>> Brain Shell Startup >>>
+dofile(os.getenv("HOME") .. "/.config/Brain_Shell/hypr/brain-shell.lua")
+-- <<< Brain Shell Startup <<<

@@ -3,6 +3,7 @@ vim.pack.add {
 }
 local bar_bg = '#24243a'
 local subtle_fg = '#a9b1d6'
+local breadcrumb = require 'custom.breadcrumb'
 
 require('lualine').setup {
   options = {
@@ -28,9 +29,17 @@ require('lualine').setup {
 
     lualine_c = {
       {
+        -- Repo breadcrumb: "dotfiles > … > plugins > " (empty outside git repos)
+        breadcrumb.dirs,
+        color = { fg = '#7f849c', bg = bar_bg },
+        padding = { left = 1, right = 0 },
+      },
+      {
+        -- Filename keeps lualine's [No Name] / [+] / [-] handling
         'filename',
         path = 0,
         color = { fg = subtle_fg, bg = bar_bg },
+        padding = { left = 0, right = 1 },
       },
       {
         -- Git change counts for the current file: +added ~modified -removed

@@ -228,6 +228,10 @@ sudo firewall-cmd --set-default-zone=home
 
 Log out/in (or reboot) after the group change.
 
+If `stow` reports `--target value ... is not a valid directory` on a fresh
+home, `git pull` and rerun `./install.sh --all`: the script now creates
+`~/.config`, `~/.local/bin`, and `~/.local/src` before stowing.
+
 ## 11. AMD / voxtype
 
 The tracked `config/voxtype/config.toml` uses `gpu_device = 1` (the laptop's

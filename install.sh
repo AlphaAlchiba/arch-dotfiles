@@ -197,6 +197,10 @@ yay -S --needed --noconfirm - < "$DOTFILES/packages/aur.txt" 2>/dev/null || \
 log "Linking config files..."
 command -v stow >/dev/null 2>&1 || sudo pacman -S --noconfirm stow
 
+# Fresh installs may not have these directories yet. stow requires the target
+# directory to exist, and Brain_Shell is cloned under ~/.local/src.
+mkdir -p "$HOME/.config" "$HOME/.local/bin" "$HOME/.local/src"
+
 # Remove existing target dirs so stow can create clean symlinks
 # (only removes real files/dirs, not existing symlinks — stow handles those)
 for dir in "$DOTFILES"/config/*/; do

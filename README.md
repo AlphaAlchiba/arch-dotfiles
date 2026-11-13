@@ -4,8 +4,8 @@ Full desktop configuration for an **Arch Linux** system running **Hyprland** (Wa
 
 ## Hardware Context
 
-- **Laptop**: Laptop (Intel CPU, 16GB RAM, NVIDIA GPU)
-- **Docked**: Dual external monitors (2560×1440 @ 120Hz)
+- **Laptop**: Intel + NVIDIA Optimus hybrid (16GB RAM)
+- **Docked**: Dual 1440p monitors @ 120Hz
 - **GPU**: Intel integrated + NVIDIA Optimus (via envycontrol)
 - **Login**: greetd + tuigreet → Hyprland
 
@@ -20,7 +20,7 @@ The `install.sh` script assumes:
 ## Quick Start
 
 ```bash
-git clone git@github.com:AlphaAlchiba/arch-dotfiles.git ~/dotfiles
+git clone https://github.com/AlphaAlchiba/arch-dotfiles.git ~/dotfiles
 cd ~/dotfiles
 ./install.sh
 ```

@@ -254,7 +254,7 @@ cd ~/dotfiles && stow -R -d . -t ~/.config config   # re-link
 | Update package lists | `pacman -Qqen \| sort > ~/dotfiles/packages/official.txt` |
 | Load new secrets into shell | `source ~/.opencode-secrets` |
 | Verify symlink target | `ls -la ~/.config/tmux` (should show `-> ../dotfiles/config/tmux`) |
-| Restore on new machine | `git clone git@github.com:AlphaAlchiba/arch-dotfiles.git ~/dotfiles && cd ~/dotfiles && ./install.sh` |
+| Restore on new machine | `git clone https://github.com/AlphaAlchiba/arch-dotfiles.git ~/dotfiles && cd ~/dotfiles && ./install.sh` |
 
 ---
 

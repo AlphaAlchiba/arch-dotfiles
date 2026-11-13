@@ -15,6 +15,9 @@ __pycache__/
 node_modules/
 .ruff_cache/
 
+# Machine-specific monitor rules (serial numbers / port layout)
+config/hypr/modules/monitors.local.lua
+
 # Brain_Shell runtime state (rewritten by Quickshell)
 config/Brain_Shell/user_data/*.json
 config/Brain_Shell/src/user_data/*.json

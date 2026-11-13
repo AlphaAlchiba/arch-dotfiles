@@ -39,6 +39,7 @@ doctor:
     fail=0
     ok()  { printf '  \033[32m✓\033[0m %s\n' "$1"; }
     bad() { printf '  \033[31m✗\033[0m %s\n' "$1"; fail=1; }
+    warn() { printf '  \033[33m!\033[0m %s\n' "$1"; }
 
     echo "== Git =="
     if [[ -n "$(git status --porcelain)" ]]; then
@@ -106,9 +107,23 @@ doctor:
     fi
 
     echo "== Tools =="
-    for tool in opencode uv stow yay just; do
-      command -v "$tool" >/dev/null 2>&1 && ok "$tool" || bad "$tool missing"
+    has_tool() {
+      local t="$1"
+      command -v "$t" >/dev/null 2>&1 || \
+        [ -x "$HOME/.local/bin/$t" ] || \
+        [ -x "$HOME/.opencode/bin/$t" ] || \
+        [ -x "$HOME/.cargo/bin/$t" ]
+    }
+    for tool in stow yay just; do
+      has_tool "$tool" && ok "$tool" || bad "$tool missing"
     done
+    for tool in opencode uv rustup cargo; do
+      has_tool "$tool" && ok "$tool" || bad "$tool missing (run: ./install.sh --tools)"
+    done
+    for tool in tuxedo sqlit; do
+      has_tool "$tool" && ok "$tool" || warn "$tool missing (optional; run: ./install.sh --tools)"
+    done
+    [ -s "$HOME/.nvm/nvm.sh" ] && ok "nvm" || warn "nvm missing (optional; run: ./install.sh --tools)"
 
     echo ""
     if [[ $fail -eq 0 ]]; then

@@ -282,6 +282,27 @@ uv tool install --with psycopg2-binary sqlit-tui
 The flags keep the installers from editing the stowed shell files. Install
 `uv` and `rustup` before opening a new shell.
 
+These tools are deliberately not in `packages/official.txt` or
+`packages/aur.txt`; they are user-local binaries:
+
+| Tool | Location | Installed by |
+|---|---|---|
+| `opencode` | `~/.opencode/bin/opencode` | `--tools` |
+| `uv` | `~/.local/bin/uv` | `--tools` |
+| `rustup` / `cargo` | `~/.cargo/bin/` | `--tools` |
+| `nvm` | `~/.nvm/nvm.sh` | `--tools` |
+| `tuxedo` | `~/.cargo/bin/tuxedo` | `--tools` |
+| `sqlit` | `~/.local/bin/sqlit` | `--tools` |
+
+The base install also adds per-machine packages that are not in the lists:
+`amd-ucode`, `linux-headers`, `zram-generator`, `vulkan-radeon`,
+`vulkan-icd-loader`, `libva-mesa-driver`. `nvidia-*`/`envycontrol` are
+laptop-only; `os-prober` is only for the later Windows dual boot.
+
+If `just doctor` reports a tool missing right after `--tools`, the binary is
+probably installed but the current shell PATH is stale. Run `exec zsh` or
+re-login, or check the path directly.
+
 `install.sh` creates a `~/.opencode-secrets` template with commented
 placeholders. Fill in `CONTEXT7_API_KEY`, `BRAVE_API_KEY`, and the GCP project
 ids if you use the Gemini aliases, then `chmod 600 ~/.opencode-secrets`.

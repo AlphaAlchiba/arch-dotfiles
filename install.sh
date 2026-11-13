@@ -316,6 +316,10 @@ if [[ $INSTALL_TOOLS -eq 0 ]]; then
     echo "    5. tuxedo:      cargo install tuxedo"
     echo "    6. sqlit:       uv tool install --with psycopg2-binary sqlit-tui"
     echo ""
+else
+    echo "  Tool binaries live in ~/.local/bin, ~/.opencode/bin, and ~/.cargo/bin."
+    echo "  Run 'exec zsh' (or re-login) to refresh PATH."
+    echo ""
 fi
 
 echo "  After reboot:"

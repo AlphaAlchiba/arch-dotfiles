@@ -44,6 +44,8 @@ cd ~/dotfiles
 
 The default run stays user-level and safe; `/etc`, system services, and remote installers are opt-in.
 
+`opencode`, `uv`, `rustup`, `nvm`, `tuxedo`, and `sqlit` are user-local tools installed by `--tools`, not pacman packages. If `just doctor` reports them missing right after install, run `exec zsh` or re-login to refresh PATH.
+
 ## Dotfiles Management (just)
 
 The repo ships a `justfile` for day-to-day management — `just` is installed via `packages/official.txt`:

@@ -2,21 +2,27 @@
 # =============================================================================
 # Dotfiles Bootstrap Script
 # =============================================================================
-# Usage: cd ~/dotfiles && ./install.sh
+# Usage: cd ~/dotfiles && ./install.sh [--system] [--tools] [--all]
+#
+#   (no flags)  packages + stow + Brain_Shell + user services
+#   --system    configure greetd, enable system services, add groups, firewall zone
+#   --tools     install uv, rustup, nvm, opencode, tuxedo, sqlit
+#   --all       --system and --tools
 #
 # What this does:
 #   1. Installs yay (AUR helper) if missing
 #   2. Ranks mirrors (rate-mirrors) and enables paccache.timer
 #   3. Installs all packages from packages/official.txt and packages/aur.txt
 #   4. Stows config files into ~/.config with symlinks
-#   5. Clones Brain_Shell to ~/.local/src/Brain_Shell
-#   6. Enables user systemd services (voxtype, cliphist-wipe)
-#   7. Checks for OpenCode API key in ~/.opencode-secrets
+#   5. Sets zsh as the login shell
+#   6. Clones Brain_Shell to ~/.local/src/Brain_Shell
+#   7. Enables user systemd services (voxtype, cliphist-wipe)
+#   8. Creates a ~/.opencode-secrets template if missing
 #
-# Manual steps required after (see end of script):
-#   - Enable and start system services (docker, firewalld)
-#   - Open nvim to run vim.pack.update()
-#   - Install OpenCode binary
+# Manual steps required after:
+#   - Open nvim and run :lua vim.pack.update()
+#   - Fill in ~/.opencode-secrets
+#   - --system/--tools are opt-in so the default run stays user-level and safe.
 # =============================================================================
 
 set -euo pipefail
@@ -31,11 +37,126 @@ log()  { echo -e "${GREEN}[+]${NC} $1"; }
 warn() { echo -e "${YELLOW}[!]${NC} $1"; }
 err()  { echo -e "${RED}[x]${NC} $1"; exit 1; }
 
+usage() {
+    cat <<'EOF'
+Usage: ./install.sh [--system] [--tools] [--all]
+
+  (no flags)  install packages, stow dotfiles, clone Brain_Shell, user services
+  --system    configure greetd, enable system services, add groups, firewall zone
+  --tools     install uv, rustup, nvm, opencode, tuxedo, sqlit
+  --all       --system and --tools
+
+Environment:
+  MIRROR_COUNTRY=DE   prioritize mirrors from a country with rate-mirrors
+EOF
+}
+
+setup_system() {
+    log "Configuring greetd..."
+    if systemctl cat greetd.service >/dev/null 2>&1 && \
+       command -v tuigreet >/dev/null 2>&1 && \
+       command -v start-hyprland >/dev/null 2>&1; then
+        sudo mkdir -p /etc/greetd
+        if [ -f /etc/greetd/config.toml ]; then
+            sudo cp /etc/greetd/config.toml /etc/greetd/config.toml.bak
+        fi
+        sudo tee /etc/greetd/config.toml >/dev/null <<EOF
+[terminal]
+vt = 1
+
+[default_session]
+command = "tuigreet --cmd start-hyprland --remember --remember-user-session"
+user = "$(id -un)"
+EOF
+        sudo systemctl enable greetd 2>/dev/null || warn "Could not enable greetd"
+    else
+        warn "greetd/tuigreet/start-hyprland missing; skipping greetd config"
+    fi
+
+    log "Enabling fstrim.timer..."
+    sudo systemctl enable --now fstrim.timer 2>/dev/null || \
+        warn "Could not enable fstrim.timer"
+
+    log "Enabling system services..."
+    local svc
+    for svc in docker firewalld libvirtd mullvad-daemon; do
+        if systemctl cat "$svc.service" >/dev/null 2>&1; then
+            sudo systemctl enable --now "$svc.service" 2>/dev/null || \
+                warn "Could not enable $svc.service"
+        fi
+    done
+
+    local groups=()
+    if getent group docker >/dev/null 2>&1; then groups+=(docker); fi
+    if getent group libvirt >/dev/null 2>&1; then groups+=(libvirt); fi
+    if [[ ${#groups[@]} -gt 0 ]]; then
+        local group_list
+        group_list="$(IFS=,; echo "${groups[*]}")"
+        sudo usermod -aG "$group_list" "$(id -un)" 2>/dev/null || \
+            warn "Could not add $(id -un) to $group_list"
+    fi
+
+    if systemctl is-active --quiet firewalld 2>/dev/null; then
+        sudo firewall-cmd --set-default-zone=home 2>/dev/null || \
+            warn "Could not set firewalld default zone to home"
+    fi
+}
+
+install_tools() {
+    log "Installing non-pacman tools..."
+    export PATH="$HOME/.local/bin:$HOME/.opencode/bin:$HOME/.cargo/bin:$PATH"
+
+    if ! command -v uv >/dev/null 2>&1 && [ ! -x "$HOME/.local/bin/uv" ]; then
+        curl -LsSf https://astral.sh/uv/install.sh | UV_NO_MODIFY_PATH=1 sh || \
+            warn "uv install failed"
+    fi
+    export PATH="$HOME/.local/bin:$PATH"
+
+    if ! command -v cargo >/dev/null 2>&1 && [ ! -x "$HOME/.cargo/bin/cargo" ]; then
+        curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | \
+            sh -s -- -y --no-modify-path || warn "rustup install failed"
+    fi
+    if [ -f "$HOME/.cargo/env" ]; then
+        . "$HOME/.cargo/env"
+    fi
+
+    if [ ! -s "$HOME/.nvm/nvm.sh" ]; then
+        curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | \
+            PROFILE=/dev/null bash || warn "nvm install failed"
+    fi
+
+    if ! command -v opencode >/dev/null 2>&1 && [ ! -x "$HOME/.opencode/bin/opencode" ]; then
+        curl -fsSL https://opencode.ai/install.sh | sh || warn "opencode install failed"
+    fi
+
+    if command -v cargo >/dev/null 2>&1 && ! command -v tuxedo >/dev/null 2>&1; then
+        cargo install tuxedo || warn "tuxedo install failed"
+    fi
+
+    if command -v uv >/dev/null 2>&1; then
+        uv tool install --with psycopg2-binary sqlit-tui || \
+            warn "sqlit install failed (rerun: uv tool install --with psycopg2-binary sqlit-tui)"
+    fi
+}
+
 # ── Pre-flight checks ──────────────────────────────────────────────────────
 [[ $EUID -eq 0 ]] && err "Do not run as root. This script uses sudo where needed."
 [[ -f "$DOTFILES/packages/official.txt" ]] || err "Missing $DOTFILES/packages/official.txt"
 [[ -f "$DOTFILES/packages/aur.txt" ]]      || err "Missing $DOTFILES/packages/aur.txt"
 command -v pacman >/dev/null 2>&1 || err "This script requires Arch Linux with pacman"
+
+# ── Options ────────────────────────────────────────────────────────────────
+SETUP_SYSTEM=0
+INSTALL_TOOLS=0
+for arg in "$@"; do
+    case "$arg" in
+        --system) SETUP_SYSTEM=1 ;;
+        --tools)  INSTALL_TOOLS=1 ;;
+        --all)    SETUP_SYSTEM=1; INSTALL_TOOLS=1 ;;
+        -h|--help) usage; exit 0 ;;
+        *) usage >&2; err "Unknown option: $arg" ;;
+    esac
+done
 
 # ── 1. Install yay (AUR helper) ────────────────────────────────────────────
 if ! command -v yay &>/dev/null; then
@@ -140,40 +261,62 @@ systemctl --user daemon-reload
 systemctl --user enable voxtype.service cliphist-wipe.service 2>/dev/null || \
     warn "Could not enable user services (finish the install manually)"
 
-# ── 6. OpenCode API key ────────────────────────────────────────────────────
+# ── 5.5 Optional system setup ──────────────────────────────────────────────
+if [[ $SETUP_SYSTEM -eq 1 ]]; then
+    setup_system
+fi
+
+# ── 6. OpenCode / secrets file ─────────────────────────────────────────────
 if [ -f "$HOME/.opencode-secrets" ]; then
     log "OpenCode secrets file found (already configured)."
 else
-    echo ""
-    warn "OpenCode API key not found."
-    warn "To set it up later:"
-    echo "  echo 'export CONTEXT7_API_KEY=\"your-key-here\"' > ~/.opencode-secrets"
-    echo "  chmod 600 ~/.opencode-secrets"
-    echo ""
+    warn "OpenCode secrets file not found; creating a template."
+    cat > "$HOME/.opencode-secrets" <<'EOF'
+# Fill in the values below, then reload the shell.
+# export CONTEXT7_API_KEY="your-key"
+# export BRAVE_API_KEY="your-key"
+# export GOOGLE_CLOUD_PROJECT_ID="your-gcp-project"
+# export GOOGLE_CLOUD_PROJECT="your-gcp-project"
+EOF
+    chmod 600 "$HOME/.opencode-secrets"
+    echo "  Edit: ~/.opencode-secrets"
 fi
 
-# ── 7. Done — show manual steps ─────────────────────────────────────────────
+# ── 6.5 Optional non-pacman tools ──────────────────────────────────────────
+if [[ $INSTALL_TOOLS -eq 1 ]]; then
+    install_tools
+fi
+
+# ── 7. Done — show remaining manual steps ──────────────────────────────────
 echo ""
 echo "=============================================="
 echo " Dotfiles installed."
 echo "=============================================="
 echo ""
-echo "  SUDO required:"
-echo "    sudo systemctl enable --now docker firewalld"
-echo "    sudo usermod -aG docker $USER   # then logout/login"
-echo "    sudo firewall-cmd --set-default-zone=home"
-echo ""
-echo "  Non-pacman tools (install manually):"
-echo "    1. uv:          curl -LsSf https://astral.sh/uv/install.sh | sh"
-echo "    2. rustup:      curl --proto '=https' -sSf https://sh.rustup.rs | sh"
-echo "    3. nvm:         curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash"
-echo "    4. opencode:    curl -fsSL https://opencode.ai/install.sh | sh"
-echo "    5. tuxedo:      cargo install tuxedo"
-echo "    6. sqlit:       uv tool install --with psycopg2-binary sqlit-tui"
-echo ""
+
+if [[ $SETUP_SYSTEM -eq 0 ]]; then
+    echo "  System setup skipped (rerun with --system to automate):"
+    echo "    greetd:      write /etc/greetd/config.toml and enable greetd"
+    echo "    services:    sudo systemctl enable --now fstrim.timer docker firewalld libvirtd mullvad-daemon"
+    echo "    groups:      sudo usermod -aG docker,libvirt $(id -un)   # then logout/login"
+    echo "    firewall:    sudo firewall-cmd --set-default-zone=home"
+    echo ""
+fi
+
+if [[ $INSTALL_TOOLS -eq 0 ]]; then
+    echo "  Non-pacman tools skipped (rerun with --tools to automate):"
+    echo "    1. uv:          curl -LsSf https://astral.sh/uv/install.sh | sh"
+    echo "    2. rustup:      curl --proto '=https' -sSf https://sh.rustup.rs | sh"
+    echo "    3. nvm:         curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash"
+    echo "    4. opencode:    curl -fsSL https://opencode.ai/install.sh | sh"
+    echo "    5. tuxedo:      cargo install tuxedo"
+    echo "    6. sqlit:       uv tool install --with psycopg2-binary sqlit-tui"
+    echo ""
+fi
+
 echo "  After reboot:"
 echo "    1. Open nvim — run: :lua vim.pack.update()"
-echo "    2. Set up secrets: echo 'export CONTEXT7_API_KEY=your-key' > ~/.opencode-secrets"
-echo "    3. Restore wallpapers to ~/wallpapers/"
+echo "    2. Edit secrets: ~/.opencode-secrets"
+echo "    3. Restore wallpapers to ~/Pictures/Wallpapers/"
 echo "    4. Log into your accounts (browsers, Spotify, Signal, etc.)"
 echo ""

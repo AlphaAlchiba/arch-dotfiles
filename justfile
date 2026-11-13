@@ -8,6 +8,10 @@ default:
 install:
     ./install.sh
 
+# Full bootstrap with system setup and non-pacman tools
+bootstrap:
+    ./install.sh --all
+
 # Re-link all stow packages
 stow:
     stow -R -d . -t ~/.config config

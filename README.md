@@ -30,8 +30,19 @@ For a step-by-step fresh install (partitioning, bootloader, AMD mini PC notes), 
 ```bash
 git clone https://github.com/AlphaAlchiba/arch-dotfiles.git ~/dotfiles
 cd ~/dotfiles
-./install.sh
+./install.sh --all
 ```
+
+`install.sh` flags:
+
+| Command | What it does |
+|---|---|
+| `./install.sh` | Packages, stow, Brain_Shell, user services |
+| `./install.sh --system` | Also greetd, fstrim, system services, groups, firewall zone |
+| `./install.sh --tools` | Also uv, rustup, nvm, opencode, tuxedo, sqlit |
+| `./install.sh --all` | `--system` + `--tools` |
+
+The default run stays user-level and safe; `/etc`, system services, and remote installers are opt-in.
 
 ## Dotfiles Management (just)
 
@@ -40,6 +51,7 @@ The repo ships a `justfile` for day-to-day management — `just` is installed vi
 | Recipe | What it does |
 |---|---|
 | `just install` | Full bootstrap (same as `./install.sh`) |
+| `just bootstrap` | Full bootstrap with system setup and non-pacman tools (`./install.sh --all`) |
 | `just stow` | Re-link all stow packages |
 | `just update` | `git pull --ff-only` + re-stow |
 | `just packages` | Update all packages (`yay -Syu`) |
@@ -54,6 +66,8 @@ After `install.sh` completes:
 
 ### Sudo commands (run these now)
 
+If you ran `./install.sh --system` or `--all`, these are already done. Otherwise:
+
 ```bash
 sudo systemctl enable --now docker firewalld
 sudo usermod -aG docker $USER
@@ -65,9 +79,9 @@ After `usermod`, log out and back in for the docker group to take effect.
 ### After reboot
 
 1. **Open nvim** — run `:lua vim.pack.update()` to install all plugins (pinned by `nvim-pack-lock.json`)
-2. **Install OpenCode** — `curl -fsSL https://opencode.ai/install.sh | sh`
-3. **Set up secrets** — create `~/.opencode-secrets` (chmod 600) with `CONTEXT7_API_KEY` and `BRAVE_API_KEY`; add `GOOGLE_CLOUD_PROJECT_ID` / `GOOGLE_CLOUD_PROJECT` there too for the Gemini aliases
-4. **Restore wallpapers** — copy your collection to `~/wallpapers/`
+2. **Install OpenCode** — handled by `--tools`; if skipped: `curl -fsSL https://opencode.ai/install.sh | sh`
+3. **Set up secrets** — edit `~/.opencode-secrets` (chmod 600) with `CONTEXT7_API_KEY` and `BRAVE_API_KEY`; add `GOOGLE_CLOUD_PROJECT_ID` / `GOOGLE_CLOUD_PROJECT` there too for the Gemini aliases
+4. **Restore wallpapers** — copy your collection to `~/Pictures/Wallpapers/`
 5. **Log into accounts** — browsers, Spotify, Signal, Mullvad VPN
 6. **Reload tmux** — run `tmux source-file ~/.config/tmux/tmux.conf` or `prefix + r`
 

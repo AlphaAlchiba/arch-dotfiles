@@ -37,12 +37,30 @@ sudo dd if=archlinux-*.iso of=/dev/sdX bs=4M status=progress oflag=sync
 
 - UEFI mode, Secure Boot disabled.
 - Wired Ethernet connected.
-- `timedatectl set-ntp true`.
-- Identify the target disk, and make sure you do **not** touch the SSD reserved
-  for Windows:
 
 ```bash
-lsblk -o NAME,SIZE,MODEL,SERIAL,TYPE,FSTYPE,MOUNTPOINTS
+ls /sys/firmware/efi/efivars >/dev/null 2>&1 && echo "UEFI OK" || echo "NOT UEFI"
+timedatectl set-ntp true
+
+ip -br a
+ping -c 2 archlinux.org
+```
+
+If `ping` fails on the live ISO:
+
+```bash
+systemctl restart systemd-networkd systemd-resolved
+# or
+dhcpcd
+ping -c 2 archlinux.org
+```
+
+Identify the target disk, and make sure you do **not** touch the SSD reserved
+for Windows:
+
+```bash
+lsblk -d -o NAME,SIZE,MODEL,SERIAL
+lsblk -o NAME,SIZE,TYPE,FSTYPE,MOUNTPOINTS
 ```
 
 The examples below use `/dev/nvme0n1`; replace it with the real Arch SSD.
@@ -50,16 +68,22 @@ The examples below use `/dev/nvme0n1`; replace it with the real Arch SSD.
 ## 3. Partition and format
 
 ```bash
-sgdisk --zap-all /dev/nvme0n1
-sgdisk --new=1:0:+1G --typecode=1:ef00 --change-name=1:EFI  /dev/nvme0n1
-sgdisk --new=2:0:0   --typecode=2:8300 --change-name=2:root /dev/nvme0n1
-partprobe /dev/nvme0n1
+ARCH_DISK=/dev/nvme0n1
+ARCH_PART1="${ARCH_DISK}p1"   # NVMe; for SATA use ${ARCH_DISK}1
+ARCH_PART2="${ARCH_DISK}p2"   # NVMe; for SATA use ${ARCH_DISK}2
 
-mkfs.fat -F32 -n EFI /dev/nvme0n1p1
-mkfs.ext4 -L root /dev/nvme0n1p2
+sgdisk --zap-all "$ARCH_DISK"
+sgdisk --new=1:0:+1G --typecode=1:ef00 --change-name=1:EFI  "$ARCH_DISK"
+sgdisk --new=2:0:0   --typecode=2:8300 --change-name=2:root "$ARCH_DISK"
+partprobe "$ARCH_DISK"
 
-mount /dev/nvme0n1p2 /mnt
-mount --mkdir /dev/nvme0n1p1 /mnt/boot
+mkfs.fat -F32 -n EFI "$ARCH_PART1"
+mkfs.ext4 -L root "$ARCH_PART2"
+
+mount "$ARCH_PART2" /mnt
+mount --mkdir "$ARCH_PART1" /mnt/boot
+
+lsblk -f
 ```
 
 ## 4. Base system
@@ -166,34 +190,41 @@ Remove the USB.
 
 git clone https://github.com/AlphaAlchiba/arch-dotfiles.git ~/dotfiles
 cd ~/dotfiles
-MIRROR_COUNTRY=DE ./install.sh
+MIRROR_COUNTRY=DE ./install.sh --all
 ```
 
 `install.sh` installs the full package list, stows the configs, clones
-Brain_Shell, enables the user services, and sets the login shell to zsh.
+Brain_Shell, and sets the login shell to zsh. `--all` additionally runs:
 
-Then configure the graphical login:
+- `--system`: writes `/etc/greetd/config.toml`, enables greetd, enables
+  `fstrim.timer`, enables docker/firewalld/libvirtd/mullvad, adds the user to
+  `docker`/`libvirt`, and sets the firewalld default zone to `home`.
+- `--tools`: installs uv, rustup, nvm, opencode, tuxedo, and sqlit.
+
+Use `./install.sh` alone for just packages/stow, or `--system` / `--tools`
+individually.
+
+<details>
+<summary>Manual equivalent of --system</summary>
 
 ```bash
 sudo mkdir -p /etc/greetd
 sudo tee /etc/greetd/config.toml >/dev/null <<'EOF'
 [terminal]
 vt = 1
+
 [default_session]
 command = "tuigreet --cmd start-hyprland --remember --remember-user-session"
 user = "alpha"
 EOF
 sudo systemctl enable greetd
-```
 
-Enable the system services and groups:
-
-```bash
 sudo systemctl enable --now fstrim.timer
 sudo systemctl enable --now docker firewalld libvirtd mullvad-daemon
 sudo usermod -aG docker,libvirt alpha
 sudo firewall-cmd --set-default-zone=home
 ```
+</details>
 
 Log out/in (or reboot) after the group change.
 
@@ -232,23 +263,30 @@ See `config/hypr/README.md` for the full monitor/workspace guide.
 
 ## 13. Non-pacman tools and secrets
 
+`./install.sh --tools` installs these. Manual equivalent:
+
 ```bash
-curl -LsSf https://astral.sh/uv/install.sh | sh
-curl --proto '=https' -sSf https://sh.rustup.rs | sh
-curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash
+curl -LsSf https://astral.sh/uv/install.sh | UV_NO_MODIFY_PATH=1 sh
+curl --proto '=https' -sSf https://sh.rustup.rs | sh -s -- -y --no-modify-path
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | PROFILE=/dev/null bash
 curl -fsSL https://opencode.ai/install.sh | sh
+source ~/.cargo/env
 cargo install tuxedo
 uv tool install --with psycopg2-binary sqlit-tui
 ```
 
-Install `uv` and `rustup` before opening a new shell. Recreate
-`~/.opencode-secrets` (`CONTEXT7_API_KEY`, `BRAVE_API_KEY`, and the GCP project
-ids if you use the Gemini aliases), restore SSH/GPG/pass, and copy wallpapers
-to `~/Pictures/Wallpapers`.
+The flags keep the installers from editing the stowed shell files. Install
+`uv` and `rustup` before opening a new shell.
+
+`install.sh` creates a `~/.opencode-secrets` template with commented
+placeholders. Fill in `CONTEXT7_API_KEY`, `BRAVE_API_KEY`, and the GCP project
+ids if you use the Gemini aliases, then `chmod 600 ~/.opencode-secrets`.
+Restore SSH/GPG/pass and copy wallpapers to `~/Pictures/Wallpapers`.
 
 ## 14. Verify
 
 ```bash
+getent passwd alpha     # shell should be /usr/bin/zsh
 cd ~/dotfiles
 just check
 just doctor

@@ -112,6 +112,17 @@ stow -R -d "$DOTFILES" -t "$HOME"          home   2>/dev/null || \
 stow -R -d "$DOTFILES" -t "$HOME/.local"   local-bin 2>/dev/null || \
     stow -d "$DOTFILES" -t "$HOME/.local"   local-bin
 
+# ── 3.5 Set login shell to zsh ──────────────────────────────────────────────
+# The script may be run from bash. zsh is installed in step 2, so make it the
+# login shell here — otherwise the stowed ~/.zshrc is never read.
+if command -v zsh >/dev/null 2>&1; then
+    current_shell="$(getent passwd "$(id -un)" | cut -d: -f7)"
+    if [[ "$current_shell" != "$(command -v zsh)" ]]; then
+        log "Setting login shell to zsh..."
+        sudo chsh -s "$(command -v zsh)" "$(id -un)"
+    fi
+fi
+
 # ── 4. Clone Brain_Shell ────────────────────────────────────────────────────
 if [ ! -d "$HOME/.local/src/Brain_Shell" ]; then
     log "Cloning Brain_Shell..."

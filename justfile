@@ -94,6 +94,13 @@ doctor:
       fi
     done
 
+    echo "== Shell =="
+    if [[ "$(getent passwd "$USER" | cut -d: -f7)" == "$(command -v zsh)" ]]; then
+      ok "login shell is zsh"
+    else
+      bad "login shell is not zsh (run: chsh -s $(command -v zsh))"
+    fi
+
     echo "== Tools =="
     for tool in opencode uv stow yay just; do
       command -v "$tool" >/dev/null 2>&1 && ok "$tool" || bad "$tool missing"

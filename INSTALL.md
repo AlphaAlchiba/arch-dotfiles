@@ -273,7 +273,7 @@ See `config/hypr/README.md` for the full monitor/workspace guide.
 curl -LsSf https://astral.sh/uv/install.sh | UV_NO_MODIFY_PATH=1 sh
 curl --proto '=https' -sSf https://sh.rustup.rs | sh -s -- -y --no-modify-path
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | PROFILE=/dev/null bash
-curl -fsSL https://opencode.ai/install.sh | sh
+curl -fsSL https://opencode.ai/install | bash -s -- --no-modify-path
 source ~/.cargo/env
 cargo install tuxedo
 uv tool install --with psycopg2-binary sqlit-tui

@@ -211,9 +211,7 @@ export FZF_DEFAULT_OPTS="$FZF_DEFAULT_OPTS \
   --color=info:#89b4fa,prompt:#89dceb,pointer:#89dceb \
   --color=marker:#a6e3a1,spinner:#a6e3a1,header:#a6e3a1"
 
-
-
-# Source secrets from untracked file (API keys, tokens)
+# API keys, tokens, and cloud project ids live in ~/.opencode-secrets (untracked).
 [ -f "$HOME/.opencode-secrets" ] && source "$HOME/.opencode-secrets"
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
@@ -362,7 +360,9 @@ eval "$(starship init zsh)"
 eval "$(zoxide init zsh)"
 
 source "$HOME/.local/bin/env"
-eval "$(uv generate-shell-completion zsh)"
+if command -v uv >/dev/null 2>&1; then
+  eval "$(uv generate-shell-completion zsh)"
+fi
 
 # Navi (Interactive Cheat Sheet)
 if command -v navi >/dev/null 2>&1; then

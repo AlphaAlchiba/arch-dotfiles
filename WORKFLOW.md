@@ -238,7 +238,7 @@ cd ~/dotfiles && stow -R -d . -t ~/.config config   # re-link
 | `~/dotfiles/home/.zshrc` | Shell config (symlinked to `~/.zshrc`) |
 | `~/dotfiles/packages/official.txt` | Native package list |
 | `~/dotfiles/packages/aur.txt` | AUR package list |
-| `~/.opencode-secrets` | Centralized secrets (untracked, loaded by `.zshrc`) |
+| `~/.opencode-secrets` | Centralized secrets: API keys + GCP project id (untracked, loaded by `.zshrc`) |
 | `~/dotfiles/install.sh` | Fresh-install bootstrap script |
 | `~/dotfiles/README.md` | Restore guide + keybind reference |
 | `~/dotfiles/WORKFLOW.md` | This file |

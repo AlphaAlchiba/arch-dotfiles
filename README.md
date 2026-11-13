@@ -58,7 +58,7 @@ After `usermod`, log out and back in for the docker group to take effect.
 
 1. **Open nvim** — run `:lua vim.pack.update()` to install all plugins (pinned by `nvim-pack-lock.json`)
 2. **Install OpenCode** — `curl -fsSL https://opencode.ai/install.sh | sh`
-3. **Set up OpenCode API key** — `echo 'export CONTEXT7_API_KEY="your-key"' > ~/.opencode-secrets && chmod 600 ~/.opencode-secrets`
+3. **Set up secrets** — create `~/.opencode-secrets` (chmod 600) with `CONTEXT7_API_KEY` and `BRAVE_API_KEY`; add `GOOGLE_CLOUD_PROJECT_ID` / `GOOGLE_CLOUD_PROJECT` there too for the Gemini aliases
 4. **Restore wallpapers** — copy your collection to `~/wallpapers/`
 5. **Log into accounts** — browsers, Spotify, Signal, Mullvad VPN
 6. **Reload tmux** — run `tmux source-file ~/.config/tmux/tmux.conf` or `prefix + r`

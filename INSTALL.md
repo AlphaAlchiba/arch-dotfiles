@@ -98,11 +98,11 @@ hwclock --systohc
 locale-gen
 echo 'LANG=en_US.UTF-8' > /etc/locale.conf
 
-echo 'archbox' > /etc/hostname
+echo 'minibox' > /etc/hostname
 cat > /etc/hosts <<'EOF'
 127.0.0.1 localhost
 ::1 localhost
-127.0.1.1 archbox.localdomain archbox
+127.0.1.1 minibox.localdomain minibox
 EOF
 
 passwd
@@ -114,8 +114,9 @@ EDITOR=nano visudo    # uncomment: %wheel ALL=(ALL:ALL) ALL
 Use user `alpha`: the Brain_Shell keybinds and one systemd symlink hardcode
 `/home/alpha`.
 
-Hostname is `archbox`, matching the laptop. If both machines share a LAN and
-you see mDNS/NetBIOS collisions, rename one later.
+Hostname is `minibox` for the mini PC (the laptop stays `archbox`). If both
+machines share a LAN, you now have two distinct hostnames, which avoids
+mDNS/NetBIOS collisions.
 
 ## 7. zram
 

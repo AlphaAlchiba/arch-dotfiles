@@ -23,6 +23,8 @@ The `install.sh` script assumes:
 - An active internet connection
 - Wallpapers are restored separately (not in this repo)
 
+For a step-by-step fresh install (partitioning, bootloader, AMD mini PC notes), see [INSTALL.md](INSTALL.md).
+
 ## Quick Start
 
 ```bash

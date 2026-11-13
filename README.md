@@ -9,6 +9,12 @@ Full desktop configuration for an **Arch Linux** system running **Hyprland** (Wa
 - **GPU**: Intel integrated + NVIDIA Optimus (via envycontrol)
 - **Login**: greetd + tuigreet → Hyprland
 
+## Monitors & Workspaces
+
+`config/hypr/modules/monitors.lua` is the tracked, generic config. Machine-specific monitor rules (exact `desc:` strings, disabling a monitor, workspace pinning) go in `config/hypr/modules/monitors_local.lua`, which is gitignored. Copy `config/hypr/modules/monitors_local.lua.example` and see `config/hypr/README.md` for details.
+
+Hyprland applies the first matching monitor rule, so the generic `output = ""` catch-all is loaded last; the local specific rules are loaded before it.
+
 ## Prerequisites
 
 The `install.sh` script assumes:

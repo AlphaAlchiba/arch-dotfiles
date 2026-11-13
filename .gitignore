@@ -17,6 +17,7 @@ node_modules/
 
 # Machine-specific monitor rules (serial numbers / port layout)
 config/hypr/modules/monitors.local.lua
+config/hypr/modules/monitors_local.lua
 
 # Brain_Shell runtime state (rewritten by Quickshell)
 config/Brain_Shell/user_data/*.json

@@ -1,0 +1,25 @@
+-- Copy this file to monitors_local.lua (same directory) and edit it.
+-- monitors_local.lua is gitignored and must never be committed: it contains
+-- device identifiers that should stay on this machine.
+--
+-- Find the exact description with:  hyprctl monitors
+-- Use the "description:" line prefixed with "desc:".
+-- Example: desc:Manufacturer Model SERIAL
+--
+-- Ordering: Hyprland applies the FIRST matching monitor rule. This file is
+-- loaded before the generic catch-all in monitors.lua, so specific rules win.
+
+-- Disable a monitor:
+hl.monitor({
+	output = "desc:Manufacturer Model SERIAL",
+	mode = "2560x1440@120",
+	position = "0x0",
+	scale = 1,
+	disabled = true,
+})
+
+-- Pin workspaces to a monitor. `default = true` marks the workspace shown
+-- when the monitor is first used.
+hl.workspace_rule({ workspace = "1", monitor = "desc:Manufacturer Model SERIAL", default = true })
+hl.workspace_rule({ workspace = "2", monitor = "desc:Manufacturer Model SERIAL" })
+hl.workspace_rule({ workspace = "3", monitor = "desc:Manufacturer Model SERIAL" })

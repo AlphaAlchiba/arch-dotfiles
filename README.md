@@ -20,7 +20,7 @@ The `install.sh` script assumes:
 ## Quick Start
 
 ```bash
-git clone git@github.com:AlphaAlchiba/dotfiles.git ~/dotfiles
+git clone git@github.com:AlphaAlchiba/arch-dotfiles.git ~/dotfiles
 cd ~/dotfiles
 ./install.sh
 ```

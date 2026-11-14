@@ -5,8 +5,9 @@ Full desktop configuration for an **Arch Linux** system running **Hyprland** (Wa
 ## Hardware Context
 
 - **Laptop**: Intel + NVIDIA Optimus hybrid (16GB RAM)
-- **Docked**: Dual 1440p monitors @ 120Hz
-- **GPU**: Intel integrated + NVIDIA Optimus (via envycontrol)
+- **Mini PC**: AMD Ryzen mini PC (Radeon iGPU, 32GB RAM)
+- **Docked**: dual 1440p monitors @ 120Hz via a Thunderbolt/USB4 hub monitor
+- **GPU**: Intel integrated + NVIDIA Optimus (laptop) / AMD Radeon (mini PC)
 - **Login**: greetd + tuigreet → Hyprland
 
 ## Monitors & Workspaces
@@ -403,7 +404,7 @@ Three layers must stay synchronized:
 
 ```
 greetd → tuigreet (login) → Hyprland
-  ├── hypridle       (idle daemon, lock/suspend)
+  ├── hypridle       (idle daemon; lock/DPMS/suspend from hypridle.conf)
   ├── hyprpolkitagent (polkit authentication)
   ├── cliphist        (clipboard history, text + image)
   ├── awww-daemon     (wallpaper daemon)
@@ -425,6 +426,8 @@ Two layouts are configured: **US English** and **US International** (dead keys f
 
 - **NVIDIA driver** (`nvidia-open-dkms`): Requires envycontrol to switch between integrated and hybrid mode. The driver may need manual setup. If you don't need the dGPU, remove the package (it rebuilds on every kernel update).
 - **`.gitconfig`**: Global git config is managed through dotfiles (stowed). Changes should be made in `~/dotfiles/home/.gitconfig`, not `~/.gitconfig` directly.
+- **Suspend can break USB4/Thunderbolt docks**: on machines that only expose `s2idle` (no S3), resume may fail to restore the dock's DisplayPort tunnel or USB devices, leaving the screens black and peripheral input dead. The tracked `hypridle.conf` enables suspend; machines affected by this should use a local `hypridle_local.conf` that omits the suspend listener. See `config/hypr/README.md`.
+- **Dock USB2 devices can disappear**: a dock's USB2 sideband can fail to re-enumerate while USB3 and the display keep working, so a keyboard/mouse attached to the dock stops working. Recover by replugging the Thunderbolt/USB-C cable or power-cycling the dock, then run `just dock-check` to see the Thunderbolt, display, and USB state. Docks not enrolled in `bolt` stay unauthorized; this is harmless until a PCIe device is attached, after which `sudo boltctl enroll --policy auto <uuid>` stores and auto-authorizes it.
 
 ## Color Palette Reference
 

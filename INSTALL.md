@@ -340,7 +340,83 @@ sudo grub-mkconfig -o /boot/grub/grub.cfg
 Set the preferred boot order with `efibootmgr` or the firmware setup. Disable
 Windows Fast Startup and handle BitLocker recovery before/after the install.
 
-## 16. Optional
+## 16. Sleep and Thunderbolt/USB4 docks
+
+### Suspend may not survive resume
+
+Check which sleep states the firmware exposes:
+
+```bash
+cat /sys/power/mem_sleep
+journalctl -b -k | grep "ACPI: PM:"
+```
+
+If only `[s2idle]` is available (no `deep`), suspend is "modern standby" and
+resume depends on the GPU and dock firmware. With a USB4/Thunderbolt dock,
+resume can fail to restore the DisplayPort tunnel or the dock's USB devices,
+leaving black screens and dead peripherals.
+
+The tracked `hypridle.conf` enables suspend. If resume is broken on this
+machine, create a gitignored local override that drops the suspend listener:
+
+```bash
+cp ~/.config/hypr/hypridle.conf ~/.config/hypr/hypridle_local.conf
+# remove the final suspend listener, then:
+pkill hypridle
+hypridle -c ~/.config/hypr/hypridle_local.conf &
+```
+
+`hyprland.lua` prefers `hypridle_local.conf` when it exists, so the shared
+default stays portable.
+
+To investigate a suspend failure, use a recoverable test and capture the
+kernel log:
+
+```bash
+sudo rtcwake -m mem -s 30
+journalctl -b -k | grep -Ei "DPIA|thunderbolt|usb"
+```
+
+Try the other installed kernel first (GRUB → Advanced options). If that fails,
+test one GRUB parameter at a time, backing up `/etc/default/grub` and
+`/boot/grub/grub.cfg` first:
+
+- `pcie_port_pm=off`
+- `pcie_aspm=off`
+
+Add the parameter to `GRUB_CMDLINE_LINUX_DEFAULT`, run
+`sudo grub-mkconfig -o /boot/grub/grub.cfg`, reboot, and test. Remove it if it
+does not help. Do not stack parameters.
+
+Hibernate needs a disk swap of roughly RAM size; zram alone is not enough.
+
+### Dock troubleshooting
+
+A USB4/Thunderbolt dock exposes independent USB3 (tunneled) and USB2 (USB-C
+sideband) paths. The USB2 sideband can fail to re-enumerate on its own, so a
+keyboard/mouse attached to the dock disappears while USB3 devices and the
+display keep working. Check the current state with:
+
+```bash
+just dock-check
+```
+
+Recovery: unplug/replug the Thunderbolt/USB-C cable, or power-cycle the dock,
+then re-run `just dock-check`. Also check the dock/monitor power options (keep
+USB powered during standby) and try the other USB4 port or a different
+certified cable.
+
+Docks not enrolled in `bolt` remain unauthorized (`boltctl list`). This does
+not affect USB or DisplayPort, but enroll one if you attach PCIe devices or
+want persistent authorization:
+
+```bash
+boltctl list
+sudo boltctl enroll --policy auto <device-uuid>
+boltctl list                   # expect: authorized, stored
+```
+
+## 17. Optional
 
 - `lm_sensors` for temperature monitoring.
 - `fwupd` for firmware updates.

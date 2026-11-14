@@ -137,6 +137,11 @@ The local file is gitignored, so the shared default stays portable. Verify it
 with `hypridle -c ~/.config/hypr/hypridle_local.conf -v`, which logs each
 registered timeout.
 
+On machines with no controllable backlight (`/sys/class/backlight` is absent),
+also remove the 5-minute brightness listener from the override: `brightnessctl`
+may otherwise target an LED and trigger the shell's brightness OSD for no
+visible effect.
+
 To test suspend on a machine where it is disabled, use a recoverable test and
 inspect the kernel log afterwards:
 

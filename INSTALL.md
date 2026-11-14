@@ -369,6 +369,10 @@ hypridle -c ~/.config/hypr/hypridle_local.conf &
 `hyprland.lua` prefers `hypridle_local.conf` when it exists, so the shared
 default stays portable.
 
+If the machine has no controllable backlight (`/sys/class/backlight` is
+absent), also remove the brightness listener from the override: `brightnessctl`
+may otherwise change an LED and trigger the shell's brightness OSD.
+
 To investigate a suspend failure, use a recoverable test and capture the
 kernel log:
 

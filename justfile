@@ -65,6 +65,36 @@ dock-check:
     echo "cable and re-run: the dock's USB2 sideband can fail to re-enumerate"
     echo "independently of USB3 and the displays."
 
+# Re-apply the Brain Shell UI-scale patch after updating the checkout
+patch-brainshell:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    target="${BRAIN_SHELL_DIR:-$HOME/.local/src/Brain_Shell}"
+    patch="{{justfile_directory()}}/patches/brain-shell-uiscale.patch"
+
+    if [[ ! -d "$target/.git" ]]; then
+        echo "Brain Shell checkout not found at: $target" >&2
+        exit 1
+    fi
+    if [[ ! -f "$patch" ]]; then
+        echo "Patch file not found: $patch" >&2
+        exit 1
+    fi
+
+    if git -C "$target" apply --check --reverse "$patch" 2>/dev/null; then
+        echo "Already applied: $target"
+        exit 0
+    fi
+    if ! git -C "$target" apply --check "$patch" 2>/dev/null; then
+        echo "Patch does not apply cleanly to $target." >&2
+        echo "Upstream may have changed; inspect $patch." >&2
+        exit 1
+    fi
+
+    git -C "$target" apply "$patch"
+    echo "Applied UI-scale patch to $target"
+    echo "Restart Brain Shell: pkill -x quickshell && quickshell -p \"$target\" &"
+
 # Verify the system matches the repo (symlinks, packages, services)
 doctor:
     #!/usr/bin/env bash

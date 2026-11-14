@@ -1,0 +1,103 @@
+diff --git a/src/services/PrefsService.qml b/src/services/PrefsService.qml
+index ed437ad..0413ed4 100644
+--- a/src/services/PrefsService.qml
++++ b/src/services/PrefsService.qml
+@@ -80,6 +80,9 @@ QtObject {
+     property real osdDuration: 2.5
+     property bool enableVisualiser: true
+ 
++    // Global UI scale (1.0 = 100%). Replaces the per-monitor resolution heuristic.
++    property real uiScale: 1.0
++
+     property bool dynamicThemeOverride: false
+     property bool darkMode: true
+     property real bgOpacity: 1.0
+@@ -161,6 +164,7 @@ QtObject {
+             if (o.enableOsd !== undefined) root.enableOsd = o.enableOsd
+             if (o.osdDuration !== undefined) root.osdDuration = o.osdDuration
+             if (o.enableVisualiser !== undefined) root.enableVisualiser = o.enableVisualiser
++            if (o.uiScale !== undefined) root.uiScale = o.uiScale
+ 
+             if (o.dynamicThemeOverride !== undefined) root.dynamicThemeOverride = o.dynamicThemeOverride
+             if (o.darkMode !== undefined) root.darkMode = o.darkMode
+@@ -216,6 +220,7 @@ QtObject {
+     onEnableOsdChanged: if (_loaded) saveConfig()
+     onOsdDurationChanged: if (_loaded) saveConfig()
+     onEnableVisualiserChanged: if (_loaded) saveConfig()
++    onUiScaleChanged: if (_loaded) saveConfig()
+     onDynamicThemeOverrideChanged: if (_loaded) saveConfig()
+     onDarkModeChanged: if (_loaded) saveConfig()
+     onBgOpacityChanged: { if (bgOpacity >= 0.95 && bgBlur) { bgBlur = false } if (_loaded) saveConfig() }
+@@ -267,6 +272,7 @@ QtObject {
+             enableOsd: root.enableOsd,
+             osdDuration: root.osdDuration,
+             enableVisualiser: root.enableVisualiser,
++            uiScale: root.uiScale,
+             dynamicThemeOverride: root.dynamicThemeOverride,
+             darkMode: root.darkMode,
+             bgOpacity: root.bgOpacity,
+diff --git a/src/windows/ConfirmDialog.qml b/src/windows/ConfirmDialog.qml
+index 0dd82b6..68292ab 100644
+--- a/src/windows/ConfirmDialog.qml
++++ b/src/windows/ConfirmDialog.qml
+@@ -38,7 +38,7 @@ import "../services/"
+ 
+ PanelWindow {
+     id: root
+-    readonly property real localScale: Math.max(0.75, Math.min(1.5, (screen ? screen.height : 1080.0) / 1080.0))
++    readonly property real localScale: Math.max(0.5, Math.min(2.0, PrefsService.uiScale))
+ 
+     color: "transparent"
+ 
+diff --git a/src/windows/DynamicSurface.qml b/src/windows/DynamicSurface.qml
+index 888ca3d..43e0838 100644
+--- a/src/windows/DynamicSurface.qml
++++ b/src/windows/DynamicSurface.qml
+@@ -33,7 +33,7 @@ PanelWindow {
+     id: root
+     // --- CLICK SHIELD ---
+     ClickShield { id: clickShield }
+-    readonly property real localScale: Math.max(0.75, Math.min(1.5, (screen ? screen.height : 1080.0) / 1080.0))
++    readonly property real localScale: Math.max(0.5, Math.min(2.0, PrefsService.uiScale))
+ 
+     anchors {
+         top: true
+diff --git a/src/windows/MigrationOverlay.qml b/src/windows/MigrationOverlay.qml
+index 1592ebf..dcfa96d 100644
+--- a/src/windows/MigrationOverlay.qml
++++ b/src/windows/MigrationOverlay.qml
+@@ -26,7 +26,7 @@ import "../"
+ PanelWindow {
+     id: root
+     
+-    readonly property real localScale: Math.max(0.75, Math.min(1.5, (screen ? screen.height : 1080.0) / 1080.0))
++    readonly property real localScale: Math.max(0.5, Math.min(2.0, PrefsService.uiScale))
+ 
+     color: "transparent"
+     anchors { top: true; left: true; right: true; bottom: true }
+diff --git a/src/windows/ShellHost.qml b/src/windows/ShellHost.qml
+index d3fd7dd..fb4be76 100644
+--- a/src/windows/ShellHost.qml
++++ b/src/windows/ShellHost.qml
+@@ -98,7 +98,7 @@ ShellRoot {
+             Item {
+                 required property var modelData
+                 readonly property var screen: modelData
+-                readonly property real localScale: Math.max(0.75, Math.min(1.5, (screen ? screen.height : 1080.0) / 1080.0))
++                readonly property real localScale: Math.max(0.5, Math.min(2.0, PrefsService.uiScale))
+                 
+                 // --- EXCLUSIVE ZONE STRUTS ---
+                 // Using phantom windows to seamlessly push active Hyprland windows inward
+diff --git a/src/windows/UpdatePopup.qml b/src/windows/UpdatePopup.qml
+index 1a7cd3a..ab0ad90 100644
+--- a/src/windows/UpdatePopup.qml
++++ b/src/windows/UpdatePopup.qml
+@@ -35,7 +35,7 @@ import "../"
+ 
+ PanelWindow {
+     id: root
+-    readonly property real localScale: Math.max(0.75, Math.min(1.5, (screen ? screen.height : 1080.0) / 1080.0))
++    readonly property real localScale: Math.max(0.5, Math.min(2.0, PrefsService.uiScale))
+ 
+     color: "transparent"
+     anchors { top: true; left: true; right: true; bottom: true }

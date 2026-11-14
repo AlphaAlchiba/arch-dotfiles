@@ -413,8 +413,24 @@ greetd → tuigreet (login) → Hyprland
        ├── Dashboard home, stats, kanban, launcher, config
        ├── Popups: power menu, notifications, clipboard, wallpaper picker
        ├── Network: wifi, bluetooth, VPN
-       └── Audio: output, input, mixer
+        └── Audio: output, input, mixer
 ```
+
+### Brain Shell UI scale
+
+Brain Shell auto-scaled its UI by `screen.height / 1080`, which makes it too
+large on 1440p monitors while the rest of the session stays at the compositor
+scale. `patches/brain-shell-uiscale.patch` adds a `uiScale` preference and uses
+it for every shell window.
+
+Re-apply it after updating the Brain Shell checkout:
+
+```bash
+just patch-brainshell
+```
+
+Set `"uiScale"` in `~/.config/Brain_Shell/src/user_data/shell_prefs.json`
+(1.0 = 100%) and restart `quickshell` to change it.
 
 ## Keyboard Layouts
 

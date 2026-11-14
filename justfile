@@ -32,6 +32,39 @@ check:
     hyprctl configerrors
     nvim --headless -c 'qa' 2>&1 | head -5
 
+# Inspect Thunderbolt/USB4 devices, connected displays, and the USB tree
+dock-check:
+    #!/usr/bin/env bash
+    set -uo pipefail
+
+    echo "== Thunderbolt =="
+    if command -v boltctl >/dev/null 2>&1; then
+        boltctl list 2>/dev/null | grep -E "^\s*\*|status:|authflags|stored" || echo "  (no Thunderbolt devices)"
+    else
+        echo "  boltctl not installed"
+    fi
+
+    echo "== Connected displays =="
+    for c in /sys/class/drm/card*-*; do
+        [[ -e "$c/status" ]] || continue
+        [[ "$(cat "$c/status" 2>/dev/null)" == "connected" ]] && echo "  $(basename "$c")"
+    done
+
+    echo "== USB tree =="
+    for d in /sys/bus/usb/devices/*; do
+        [[ -e "$d/idVendor" ]] || continue
+        printf "  %-10s %s:%s  %s\n" \
+            "$(basename "$d")" \
+            "$(cat "$d/idVendor" 2>/dev/null)" \
+            "$(cat "$d/idProduct" 2>/dev/null)" \
+            "$(cat "$d/product" 2>/dev/null)"
+    done
+
+    echo
+    echo "If a dock keyboard/mouse is missing above, replug the Thunderbolt/USB-C"
+    echo "cable and re-run: the dock's USB2 sideband can fail to re-enumerate"
+    echo "independently of USB3 and the displays."
+
 # Verify the system matches the repo (symlinks, packages, services)
 doctor:
     #!/usr/bin/env bash

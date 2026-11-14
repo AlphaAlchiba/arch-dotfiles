@@ -19,6 +19,9 @@ node_modules/
 config/hypr/modules/monitors.local.lua
 config/hypr/modules/monitors_local.lua
 
+# Machine-specific idle policy (e.g. opt out of suspend where s2idle resume is broken)
+config/hypr/hypridle_local.conf
+
 # Brain_Shell runtime state (rewritten by Quickshell)
 config/Brain_Shell/user_data/*.json
 config/Brain_Shell/src/user_data/*.json

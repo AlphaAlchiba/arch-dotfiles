@@ -137,6 +137,9 @@ hl.gesture({
 -- cliphist) come from ~/.config/Brain_Shell/hypr/brain-shell.lua, sourced at
 -- the bottom of this file. Do not start them here as well: a second quickshell
 -- instance reserves a second top strut and pushes windows down.
+--
+-- hypridle uses the tracked config, or hypridle_local.conf when present, so a
+-- machine can opt out of suspend without changing the shared default.
 hl.on("hyprland.start", function()
 	-- Import the session environment and start the voxtype daemon.
 	-- graphical-session.target refuses manual start (RefuseManualStart=yes)
@@ -144,7 +147,7 @@ hl.on("hyprland.start", function()
 	hl.exec_cmd("systemctl --user import-environment")
 	hl.exec_cmd("systemctl --user start voxtype.service")
 	hl.exec_cmd("hypr-layout-notify")
-	hl.exec_cmd("hypridle -c " .. os.getenv("HOME") .. "/.local/src/Brain_Shell/src/config/hypridle.conf")
+	hl.exec_cmd("sh -c 'c=\"$HOME/.config/hypr/hypridle_local.conf\"; [ -f \"$c\" ] || c=\"$HOME/.config/hypr/hypridle.conf\"; exec hypridle -c \"$c\"'")
 end)
 
 -- >>> Brain Shell Startup >>>

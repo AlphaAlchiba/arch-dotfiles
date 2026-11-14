@@ -99,6 +99,56 @@ hl.workspace_rule({ workspace = "2", monitor = "desc:Manufacturer Model SERIAL" 
 - If you disable a monitor, its workspace rules become inert; those workspaces
   fall back to the remaining monitor.
 
+## Idle, lock, and suspend
+
+`hypridle` is started from `hyprland.lua` with the tracked config
+`hypridle.conf`. If `hypridle_local.conf` exists in this directory, it is used
+instead.
+
+| File | Tracked? | Purpose |
+|---|---|---|
+| `hypridle.conf` | yes | Default policy: dim, lock, DPMS off, suspend. |
+| `hypridle_local.conf` | **no** | Optional machine-specific override (full config). Gitignored. |
+
+Default policy:
+
+| Timeout | Action |
+|---|---|
+| 5 min | dim the internal panel (`brightnessctl`) |
+| 5.5 min | lock the session with `hyprlock` |
+| 6 min | power the displays off (`hyprctl dispatch dpms off`) |
+| 15 min | suspend (`systemctl suspend`) |
+
+### Per-machine override
+
+Some machines only expose `s2idle` (no S3), and resume can fail to restore a
+USB4/Thunderbolt dock's DisplayPort tunnel or USB devices. To keep such a
+machine awake while still locking and blanking the displays, create a local
+override without the suspend listener:
+
+```bash
+cp ~/.config/hypr/hypridle.conf ~/.config/hypr/hypridle_local.conf
+# edit hypridle_local.conf and remove the final suspend listener
+pkill hypridle
+hypridle -c ~/.config/hypr/hypridle_local.conf &
+```
+
+The local file is gitignored, so the shared default stays portable. Verify it
+with `hypridle -c ~/.config/hypr/hypridle_local.conf -v`, which logs each
+registered timeout.
+
+To test suspend on a machine where it is disabled, use a recoverable test and
+inspect the kernel log afterwards:
+
+```bash
+sudo rtcwake -m mem -s 30
+journalctl -b -k | grep -Ei "DPIA|thunderbolt|usb"
+```
+
+If the displays blank but keyboard/mouse input does not bring them back, the
+dock's USB hub may be losing power in standby; check the dock/monitor power
+options and run `just dock-check`.
+
 ## Portability
 
 `monitors_local.lua` is machine-specific and is not part of the repo. On a new

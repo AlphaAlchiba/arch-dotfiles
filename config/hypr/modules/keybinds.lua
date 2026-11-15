@@ -26,7 +26,7 @@ hl.bind(mainMod .. " + SHIFT + J", hl.dsp.window.move({ direction = "down" }))
 -- screenshots
 hl.bind(mainMod .. " + S", hl.dsp.exec_cmd("hyprshot -m region --raw | satty --filename -"))
 hl.bind(mainMod .. " + SHIFT + S", hl.dsp.exec_cmd("hyprshot -m window --raw | satty --filename -"))
-hl.window_rule({ match = { class = "com.gabm.satty" }, float = true })
+hl.window_rule({ match = { class = "^(com.gabm.satty|org.satty.satty)$" }, float = true, center = true })
 -- color picker
 hl.bind(mainMod .. " + P", hl.dsp.exec_cmd("hyprpicker --notify --autocopy --format hex"))
 

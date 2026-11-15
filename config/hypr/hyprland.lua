@@ -26,6 +26,7 @@ music = "spotify"
 require("modules/monitors")
 require("modules/appearance")
 require("modules/keybinds")
+require("modules/windowrules")
 
 -------------------
 ---- AUTOSTART ----

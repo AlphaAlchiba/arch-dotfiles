@@ -1,0 +1,13 @@
+[Desktop Entry]
+Type=Service
+Name=Browse images in Loupe
+ServiceTypes=KonqPopupMenu/Plugin
+X-KDE-ServiceTypes=KonqPopupMenu/Plugin
+MimeType=image/png;image/jpeg;image/gif;image/webp;image/avif;image/bmp;image/tiff;image/x-icon;image/vnd.microsoft.icon;
+Actions=browseLoupe;
+X-KDE-Priority=TopLevel
+
+[Desktop Action browseLoupe]
+Name=Browse in Loupe
+Icon=image-x-generic
+Exec=loupe %f

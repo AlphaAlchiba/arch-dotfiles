@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+# Open an image in Satty at ~80% of the focused monitor instead of native size.
+set -euo pipefail
+
+file="${1:-}"
+[[ -n "$file" ]] || exit 1
+
+size=""
+if command -v hyprctl >/dev/null 2>&1 && command -v jq >/dev/null 2>&1; then
+    size="$(hyprctl monitors -j 2>/dev/null \
+        | jq -r '.[] | select(.focused) | "\(.width * 4 / 5 | floor)x\(.height * 4 / 5 | floor)"' \
+        2>/dev/null | head -n1 || true)"
+fi
+
+if [[ -n "$size" ]]; then
+    exec satty --filename "$file" --resize "$size"
+fi
+
+exec satty --filename "$file"

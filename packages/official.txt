@@ -1,5 +1,6 @@
 adobe-source-code-pro-fonts
 alsa-utils
+ark
 awww
 base
 base-devel
@@ -18,10 +19,12 @@ dnsmasq
 docker
 docker-compose
 dolphin
+dolphin-plugins
 efibootmgr
 eza
 fastfetch
 fd
+ffmpegthumbs
 firewalld
 freecad
 fzf
@@ -43,6 +46,7 @@ hyprsunset
 imagemagick
 jq
 just
+kdegraphics-thumbnailers
 kitty
 lazygit
 libnotify
@@ -51,6 +55,7 @@ linux
 linux-firmware
 linux-lts
 linux-lts-headers
+loupe
 matugen
 mesa
 mpd-mpris
@@ -124,6 +129,8 @@ wtype
 xdg-desktop-portal-hyprland
 xdg-user-dirs
 yazi
+zathura
+zathura-pdf-poppler
 zoxide
 zsh
 zsh-autosuggestions

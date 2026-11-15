@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=Satty (image)
+Comment=Annotate an image with Satty
+Exec=bash /home/alpha/.local/bin/satty-image %f
+Icon=image-x-generic
+Terminal=false
+Categories=Graphics;
+MimeType=image/png;image/jpeg;image/gif;image/webp;image/avif;image/bmp;image/tiff;image/x-icon;image/vnd.microsoft.icon;
+StartupNotify=true

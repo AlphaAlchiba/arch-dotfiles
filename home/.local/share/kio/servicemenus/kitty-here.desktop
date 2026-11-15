@@ -1,0 +1,13 @@
+[Desktop Entry]
+Type=Service
+Name=Open Terminal Here
+ServiceTypes=KonqPopupMenu/Plugin
+X-KDE-ServiceTypes=KonqPopupMenu/Plugin
+MimeType=inode/directory;
+Actions=openKittyHere;
+X-KDE-Priority=TopLevel
+
+[Desktop Action openKittyHere]
+Name=Open Terminal Here (kitty)
+Icon=utilities-terminal
+Exec=kitty --directory %f

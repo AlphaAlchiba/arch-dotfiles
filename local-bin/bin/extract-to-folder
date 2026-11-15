@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+# Extract each archive into a new directory named after it.
+set -euo pipefail
+
+for archive in "$@"; do
+    [[ -f "$archive" ]] || continue
+
+    # Strip compound extensions (.tar.gz, .tar.xz, ...) for the folder name.
+    base="${archive%.*}"
+    case "$archive" in
+        *.tar.gz|*.tar.bz2|*.tar.xz|*.tar.zst|*.tgz|*.tbz2|*.txz) base="${archive%.*.*}" ;;
+    esac
+
+    dest="$base"
+    n=1
+    while [[ -e "$dest" ]]; do
+        dest="${base}-${n}"
+        n=$((n + 1))
+    done
+
+    mkdir -p "$dest"
+    if ! bsdtar -xf "$archive" -C "$dest" 2>/dev/null; then
+        unzip -q "$archive" -d "$dest"
+    fi
+done

@@ -432,6 +432,30 @@ just patch-brainshell
 Set `"uiScale"` in `~/.config/Brain_Shell/src/user_data/shell_prefs.json`
 (1.0 = 100%) and restart `quickshell` to change it.
 
+### File manager, archives, and media
+
+- **Dolphin + Ark**: right-click Extract Here / Extract To / Compress, plus
+  custom "Open Terminal Here (kitty)" and "Extract to folder name" actions.
+- **Default handlers** live in `config/mimeapps.list` (Dolphin, Loupe, Zathura,
+  nvim-in-kitty, Ark, mpv).
+- **Satty** is available via **Open With** for image annotation
+  (`satty-image.desktop`, sized to ~80% of the focused monitor). It has no
+  next/prev gallery by design.
+- **Zathura** is the default PDF viewer; its Catppuccin config is in
+  `config/zathura/zathurarc`.
+- **mpv** and image viewers open floating and centered via
+  `config/hypr/modules/windowrules.lua`.
+
+Install the supporting packages with:
+
+```bash
+yay -S --needed ark dolphin-plugins ffmpegthumbs kdegraphics-thumbnailers \
+  loupe zathura zathura-pdf-poppler
+```
+
+PDFCraft is experimental and not installed by default; add `pdfcraft-bin` if
+you want to try it.
+
 ## Keyboard Layouts
 
 Two layouts are configured: **US English** and **US International** (dead keys for accents). `Ctrl + Alt` (either side) cycles through them — handled by XKB (`grp:ctrl_alt_toggle`), so it works in every app and no modifier keys are consumed. Note that any `Ctrl + Alt` chord (e.g. `Ctrl + Alt + T` in an app) also cycles the layout.

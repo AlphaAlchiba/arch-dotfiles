@@ -1,5 +1,22 @@
 local mainMod = "SUPER"
 
+-- Launch a program when an empty special workspace is created.
+-- Replaces the deprecated on_created_empty workspace rule.
+local specialWorkspacePrograms = {
+	["special:spotify"] = "spotify",
+	["special:obsidian"] = "obsidian",
+	["special:signal"] = "signal-desktop",
+	["special:dankcal"] = "dcal",
+	["special:localsend"] = "localsend",
+}
+
+hl.on("workspace.created", function(ws)
+	if not ws.is_empty then return end
+	local program = specialWorkspacePrograms[ws.name]
+	if not program then return end
+	hl.exec_cmd(program, { workspace = ws.name .. " silent" })
+end)
+
 -- Example binds, see https://wiki.hypr.land/Configuring/Basics/Binds/ for more
 hl.bind(mainMod .. " + Return", hl.dsp.exec_cmd(terminal))
 hl.bind(mainMod .. " + B", hl.dsp.exec_cmd(browser))
@@ -52,7 +69,6 @@ hl.bind(mainMod .. " + SHIFT + O", hl.dsp.layout("togglesplit"))
 
 -- spotify special workspace
 hl.bind(mainMod .. " + M", hl.dsp.workspace.toggle_special("spotify"))
-hl.workspace_rule({ workspace = "special:spotify", on_created_empty = "spotify" })
 hl.window_rule({
 	match = { class = "Spotify" },
 	float = true,
@@ -62,7 +78,6 @@ hl.window_rule({
 
 -- obsidian special workspace
 hl.bind(mainMod .. " + O", hl.dsp.workspace.toggle_special("obsidian"))
-hl.workspace_rule({ workspace = "special:obsidian", on_created_empty = "obsidian" })
 hl.window_rule({
 	match = { class = "md.obsidian.Obsidian" },
 	float = true,
@@ -75,7 +90,6 @@ hl.window_rule({
 
 -- signal special workspace
 hl.bind(mainMod .. " + I", hl.dsp.workspace.toggle_special("signal"))
-hl.workspace_rule({ workspace = "special:signal", on_created_empty = "signal-desktop" })
 hl.window_rule({
 	match = { class = "signal" },
 	float = true,
@@ -85,7 +99,6 @@ hl.window_rule({
 
 -- Dank Cal (dcal) special workspace
 hl.bind(mainMod .. " + T", hl.dsp.workspace.toggle_special("dankcal"))
-hl.workspace_rule({ workspace = "special:dankcal", on_created_empty = "dcal" })
 hl.window_rule({
 	match = { class = "com.danklinux.dankcalendar" },
 	float = true,
@@ -107,7 +120,6 @@ hl.window_rule({
 
 -- LocalSend special workspace
 hl.bind(mainMod .. " + U", hl.dsp.workspace.toggle_special("localsend"))
-hl.workspace_rule({ workspace = "special:localsend", on_created_empty = "localsend" })
 hl.window_rule({
 	match = { class = "org.localsend.localsend_app" },
 	float = true,

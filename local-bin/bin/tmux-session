@@ -1,0 +1,399 @@
+#!/usr/bin/env -S uv run --script --quiet
+# /// script
+# requires-python = ">=3.11"
+# dependencies = ["PyYAML"]
+# ///
+"""Build tmux sessions from YAML specs.
+
+Specs live in ~/.config/tmux-sessions/<name>.yaml (override with
+TMUX_SESSION_SPECS). `run` interprets a spec directly, `export` renders it as a
+standalone bash/tmux script, and `new` scaffolds both.
+"""
+
+import argparse
+import json
+import os
+import re
+import shlex
+import subprocess
+import sys
+import time
+from pathlib import Path
+
+import yaml
+
+BIN_DIR = Path(__file__).resolve().parent
+REPO_ROOT = BIN_DIR.parent.parent
+NAME_RE = re.compile(r"^[A-Za-z0-9._-]+$")
+SPLITS = ("right", "left", "top", "bottom")
+SETTLE = 0.5
+FOCUS_SETTLE = 1.5
+COLS = "\0COLS"
+ROWS = "\0ROWS"
+
+
+def default_specs() -> Path:
+    """Prefer the stowed config dir; fall back to the repo before `just stow`."""
+    home = Path("~/.config/tmux-sessions").expanduser()
+    return home if home.is_dir() else REPO_ROOT / "config" / "tmux-sessions"
+
+
+SPECS = Path(os.environ.get("TMUX_SESSION_SPECS", default_specs())).expanduser()
+SCRIPTS = Path(
+    os.environ.get("TMUX_SESSION_SCRIPTS", BIN_DIR / "tmux-sessions")
+).expanduser()
+
+
+def fail(message: str) -> None:
+    sys.exit(f"tmux-session: {message}")
+
+
+def validate(spec: object, path: Path) -> None:
+    if not isinstance(spec, dict):
+        fail(f"{path}: expected a mapping at the top level")
+
+    name = spec.get("name", path.stem)
+    if not isinstance(name, str) or not NAME_RE.fullmatch(name):
+        fail(f"{path}: invalid session name {name!r}")
+    spec["name"] = name
+
+    root = os.path.expanduser(str(spec.get("root", "")))
+    if not root:
+        fail(f"{path}: 'root' is required")
+    spec["root"] = root
+
+    windows = spec.get("windows")
+    if not isinstance(windows, list) or not windows:
+        fail(f"{path}: 'windows' must be a non-empty list")
+
+    seen = set()
+    for window in windows:
+        if not isinstance(window, dict):
+            fail(f"{path}: each window must be a mapping")
+
+        wname = window.get("name")
+        if not isinstance(wname, str) or not NAME_RE.fullmatch(wname):
+            fail(f"{path}: invalid window name {wname!r}")
+        if wname in seen:
+            fail(f"{path}: duplicate window name {wname!r}")
+        seen.add(wname)
+
+        if "index" in window and (
+            not isinstance(window["index"], int) or window["index"] < 1
+        ):
+            fail(f"{path}: window {wname!r}: 'index' must be a positive integer")
+
+        panes = window.get("panes")
+        if not isinstance(panes, list) or not panes:
+            fail(f"{path}: window {wname!r} needs a non-empty 'panes' list")
+
+        for i, pane in enumerate(panes):
+            if not isinstance(pane, dict):
+                fail(f"{path}: window {wname!r}: each pane must be a mapping")
+            if "command" in pane and not isinstance(pane["command"], str):
+                fail(f"{path}: window {wname!r}: pane {i + 1} 'command' must be a string")
+            if "split" in pane and pane["split"] not in SPLITS:
+                fail(
+                    f"{path}: window {wname!r}: pane {i + 1} 'split' must be one "
+                    f"of {SPLITS}"
+                )
+            if "from" in pane and (
+                not isinstance(pane["from"], int) or pane["from"] < 1
+            ):
+                fail(
+                    f"{path}: window {wname!r}: pane {i + 1} 'from' must be a "
+                    "positive integer"
+                )
+            if "delay" in pane and (
+                not isinstance(pane["delay"], (int, float)) or pane["delay"] < 0
+            ):
+                fail(
+                    f"{path}: window {wname!r}: pane {i + 1} 'delay' must be a "
+                    "non-negative number"
+                )
+
+        if "focus" in window and (
+            not isinstance(window["focus"], int)
+            or not 1 <= window["focus"] <= len(panes)
+        ):
+            fail(
+                f"{path}: window {wname!r}: 'focus' must be a pane number "
+                f"1..{len(panes)}"
+            )
+
+    if "start" in spec and spec["start"] not in seen:
+        fail(f"{path}: 'start' names unknown window {spec['start']!r}")
+
+
+def load(name: str) -> dict:
+    path = SPECS / f"{name}.yaml"
+    if not path.is_file():
+        fail(f"unknown session '{name}' (no {path})")
+    try:
+        with path.open() as handle:
+            spec = yaml.safe_load(handle)
+    except yaml.YAMLError as exc:
+        fail(f"{path}: {exc}")
+    validate(spec, path)
+    return spec
+
+
+def plan(spec: dict, cols: str, rows: str) -> list[tuple[str, object]]:
+    """Turn a spec into an ordered list of tmux commands and pauses."""
+    name = spec["name"]
+    root = spec["root"]
+    actions: list[tuple[str, object]] = []
+
+    def add(*args: object) -> None:
+        actions.append(("tmux", [str(arg) for arg in args]))
+
+    def pause(seconds: float) -> None:
+        actions.append(("sleep", seconds))
+
+    for i, window in enumerate(spec["windows"]):
+        panes = window["panes"]
+        target = f"{name}:{window['name']}"
+        window_dir = window.get("dir", "")
+        cwd = os.path.join(root, panes[0].get("dir", window_dir))
+
+        if i == 0:
+            add("new-session", "-d", "-s", name, "-n", window["name"], "-c", cwd)
+        else:
+            add("new-window", "-t", name, "-n", window["name"], "-c", cwd)
+
+        if "index" in window:
+            add("move-window", "-s", target, "-t", f"{name}:{window['index']}")
+            target = f"{name}:{window['index']}"
+
+        # Size before splitting, or tmux re-distributes -l percentages on attach.
+        add("resize-window", "-t", target, "-x", cols, "-y", rows)
+
+        for p, pane in enumerate(panes):
+            if p:
+                split = pane.get("split", "right")
+                flag = "-h" if split in ("right", "left") else "-v"
+                args = [
+                    "split-window",
+                    flag,
+                    "-t",
+                    f"{target}.{pane.get('from', p)}",
+                    "-c",
+                    os.path.join(root, pane.get("dir", window_dir)),
+                ]
+                if "size" in pane:
+                    args += ["-l", str(pane["size"])]
+                add(*args)
+
+            if "command" in pane:
+                add("send-keys", "-t", f"{target}.{p + 1}", pane["command"], "C-m")
+                pause(float(pane.get("delay", SETTLE)))
+
+        if "focus" in window:
+            pause(FOCUS_SETTLE)
+            add("select-pane", "-t", f"{target}.{window['focus']}")
+
+    if spec.get("start"):
+        add("select-window", "-t", f"{name}:{spec['start']}")
+
+    return actions
+
+
+def session_exists(name: str) -> bool:
+    return (
+        subprocess.run(
+            ["tmux", "has-session", "-t", name],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+        ).returncode
+        == 0
+    )
+
+
+def tmux(*args: object, dry_run: bool = False) -> None:
+    if dry_run:
+        print("tmux", *(shlex.quote(str(arg)) for arg in args))
+    else:
+        subprocess.run(["tmux", *(str(arg) for arg in args)], check=True)
+
+
+def terminal_dimension(option: str) -> str:
+    fallback = "80" if option == "cols" else "24"
+    try:
+        result = subprocess.run(
+            ["tput", option], capture_output=True, text=True, check=True
+        ).stdout.strip()
+    except (OSError, subprocess.CalledProcessError):
+        return fallback
+    return result or fallback
+
+
+def attach(name: str, dry_run: bool = False) -> None:
+    command = "switch-client" if os.environ.get("TMUX") else "attach"
+    tmux(command, "-t", name, dry_run=dry_run)
+
+
+def run(spec: dict, dry_run: bool = False) -> None:
+    name = spec["name"]
+    if not dry_run:
+        if not os.path.isdir(spec["root"]):
+            fail(f"root directory does not exist: {spec['root']}")
+        if session_exists(name):
+            return attach(name)
+
+    actions = plan(spec, terminal_dimension("cols"), terminal_dimension("lines"))
+    for kind, payload in actions:
+        if kind == "tmux":
+            tmux(*payload, dry_run=dry_run)
+        elif dry_run:
+            print(f"sleep {payload}")
+        else:
+            time.sleep(float(payload))
+
+    attach(name, dry_run)
+
+
+def bash_quote(value: str) -> str:
+    if value == COLS:
+        return '"$COLS"'
+    if value == ROWS:
+        return '"$ROWS"'
+    return shlex.quote(value)
+
+
+def export(spec: dict) -> str:
+    name = spec["name"]
+    lines = [
+        "#!/usr/bin/env bash",
+        "# Generated by tmux-session export; edit the YAML spec, not this file.",
+        "set -u",
+        "",
+        f"SESSION={shlex.quote(name)}",
+        "COLS=$(tput cols 2>/dev/null || echo 80)",
+        "ROWS=$(tput lines 2>/dev/null || echo 24)",
+        "",
+        'if ! tmux has-session -t "$SESSION" 2>/dev/null; then',
+    ]
+
+    for kind, payload in plan(spec, COLS, ROWS):
+        if kind == "sleep":
+            lines.append(f"  sleep {payload}")
+        else:
+            rendered = " ".join(bash_quote(str(arg)) for arg in payload)
+            lines.append(f"  tmux {rendered}")
+
+    lines += [
+        "fi",
+        "",
+        'if [ -n "${TMUX:-}" ]; then',
+        '  tmux switch-client -t "$SESSION"',
+        "else",
+        '  tmux attach -t "$SESSION"',
+        "fi",
+        "",
+    ]
+    return "\n".join(lines)
+
+
+def write_script(name: str) -> Path:
+    script = SCRIPTS / name
+    script.parent.mkdir(parents=True, exist_ok=True)
+    script.write_text(export(load(name)))
+    script.chmod(0o755)
+    print(f"wrote {script}")
+    return script
+
+
+TEMPLATE = """\
+name: {name}
+root: {root}
+start: code
+
+windows:
+  - name: code
+    focus: 1
+    panes:
+      - command: nvim
+      - command: opencode
+        split: right
+        size: "30%"
+      - split: bottom
+        size: "20%"
+        from: 1
+"""
+
+
+def command_new(args: argparse.Namespace) -> None:
+    if not NAME_RE.fullmatch(args.name):
+        fail(f"invalid session name: {args.name!r}")
+
+    root = Path(os.path.expanduser(args.root)).resolve()
+    if not root.is_dir():
+        fail(f"root directory does not exist: {root}")
+
+    SPECS.mkdir(parents=True, exist_ok=True)
+    spec_path = SPECS / f"{args.name}.yaml"
+    if spec_path.exists() and not args.force:
+        fail(f"{spec_path} already exists (use --force to overwrite)")
+
+    spec_path.write_text(TEMPLATE.format(name=args.name, root=json.dumps(str(root))))
+    print(f"wrote {spec_path}")
+    write_script(args.name)
+
+
+def command_export(args: argparse.Namespace) -> None:
+    text = export(load(args.name))
+    if args.write:
+        write_script(args.name)
+    elif args.output:
+        output = Path(args.output)
+        output.write_text(text)
+        output.chmod(0o755)
+        print(f"wrote {output}")
+    else:
+        print(text, end="")
+
+
+def command_list(_args: argparse.Namespace) -> None:
+    for path in sorted(SPECS.glob("*.yaml")):
+        state = "running" if session_exists(path.stem) else "-"
+        print(f"{path.stem}\t{state}")
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(prog="tmux-session", description=__doc__)
+    sub = parser.add_subparsers(dest="command", required=True)
+
+    p_run = sub.add_parser("run", help="build the session if needed, then attach")
+    p_run.add_argument("name")
+    p_run.add_argument(
+        "--dry-run", action="store_true", help="print commands instead of running them"
+    )
+
+    p_export = sub.add_parser("export", help="render a spec as a standalone bash script")
+    p_export.add_argument("name")
+    target = p_export.add_mutually_exclusive_group()
+    target.add_argument(
+        "--write", action="store_true", help="write to the tmux-sessions directory"
+    )
+    target.add_argument("-o", "--output", metavar="PATH", help="write to PATH")
+
+    p_new = sub.add_parser("new", help="scaffold a spec and its exported script")
+    p_new.add_argument("name")
+    p_new.add_argument("--root", default=os.getcwd())
+    p_new.add_argument("--force", action="store_true")
+
+    sub.add_parser("list", help="list specs and whether their sessions are running")
+
+    args = parser.parse_args()
+    if args.command == "list":
+        command_list(args)
+    elif args.command == "new":
+        command_new(args)
+    elif args.command == "run":
+        run(load(args.name), args.dry_run)
+    elif args.command == "export":
+        command_export(args)
+
+
+if __name__ == "__main__":
+    main()

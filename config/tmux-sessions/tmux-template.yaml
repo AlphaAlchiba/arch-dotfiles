@@ -1,0 +1,62 @@
+name: tmux-template
+root: "~/projects/tmux-template"
+start: backend
+
+windows:
+  - name: backend
+    dir: backend
+    focus: 1
+    panes:
+      - command: nvim
+      - command: opencode
+        split: right
+        size: "30%"
+      - split: bottom
+        size: "20%"
+        from: 1
+
+  - name: dbt
+    dir: dbt
+    focus: 1
+    panes:
+      - command: nvim
+      - command: opencode
+        split: right
+        size: "30%"
+      - split: bottom
+        size: "20%"
+        from: 1
+
+  - name: frontend
+    dir: frontend
+    focus: 1
+    panes:
+      - command: nvim
+      - command: opencode
+        split: right
+        size: "30%"
+      - split: bottom
+        size: "20%"
+        from: 1
+
+  - name: iac
+    dir: iac
+    focus: 1
+    panes:
+      - command: nvim
+      - command: opencode
+        split: right
+        size: "30%"
+      - split: bottom
+        size: "20%"
+        from: 1
+
+  - name: opencode
+    index: 8
+    panes:
+      - command: opencode
+
+  - name: shell
+    index: 9
+    panes:
+      - {}

@@ -1,0 +1,20 @@
+name: ideavault
+root: "~/projects/ideavault"
+start: django
+
+windows:
+  - name: django
+    focus: 1
+    panes:
+      - command: nvim
+      - command: opencode
+        split: right
+        size: "30%"
+      - split: bottom
+        size: "20%"
+        from: 1
+
+  - name: opencode
+    index: 8
+    panes:
+      - command: opencode

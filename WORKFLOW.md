@@ -25,6 +25,7 @@
 ~/dotfiles/                          ← git repo (github.com:AlphaAlchiba/arch-dotfiles)
 ├── config/                  ← stowed to ~/.config/
 │   ├── tmux/tmux.conf
+│   ├── tmux-sessions/               ← YAML session layouts
 │   ├── hypr/hyprland.lua + modules/
 │   ├── kitty/kitty.conf
 │   ├── nvim/init.lua + lua/
@@ -38,7 +39,8 @@
 │   ├── env
 │   ├── env.fish
 │   ├── hypr-layout-notify    ← keyboard layout change notifications
-│   └── tmux-sessions/
+│   ├── tmux-session          ← builds/exports session scripts (uv-managed)
+│   └── tmux-sessions/        ← generated standalone session scripts
 ├── packages/
 │   ├── official.txt                 ← pacman -Qqen
 │   └── aur.txt                      ← pacman -Qqem

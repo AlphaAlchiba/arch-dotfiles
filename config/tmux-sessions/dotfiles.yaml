@@ -1,0 +1,15 @@
+name: dotfiles
+root: "~/dotfiles"
+start: dotfiles
+
+windows:
+  - name: dotfiles
+    focus: 1
+    panes:
+      - command: nvim
+      - command: opencode
+        split: right
+        size: "30%"
+      - split: bottom
+        size: "20%"
+        from: 1

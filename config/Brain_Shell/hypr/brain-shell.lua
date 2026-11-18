@@ -1,7 +1,9 @@
 -- Brain Shell Autostarts
 hl.on("hyprland.start", function()
     hl.exec_cmd("awww-daemon")
-    hl.exec_cmd("hypridle")
+    -- hypridle is started by ~/.config/hypr/hyprland.lua so that
+    -- hypridle_local.conf is honoured. A second instance here would register
+    -- duplicate lock/DPMS/suspend listeners.
     hl.exec_cmd("quickshell -p " .. os.getenv("HOME") .. "/.local/src/Brain_Shell")
     hl.exec_cmd("systemctl --user start hyprpolkitagent")
     hl.exec_cmd("wl-paste --type text --watch cliphist store")

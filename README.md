@@ -39,7 +39,8 @@ cd ~/dotfiles
 | Command | What it does |
 |---|---|
 | `./install.sh` | Packages, stow, Brain_Shell, user services |
-| `./install.sh --system` | Also greetd, fstrim, system services, groups, firewall zone |
+| `./install.sh --system` | Also greetd, screen-lock PAM, fstrim, system services, groups, firewall zone |
+| `./install.sh --pam` | Only install the screen-lock PAM stack + faillock policy |
 | `./install.sh --tools` | Also uv, rustup, nvm, opencode, tuxedo, sqlit |
 | `./install.sh --all` | `--system` + `--tools` |
 
@@ -59,6 +60,7 @@ The repo ships a `justfile` for day-to-day management — `just` is installed vi
 | `just update` | `git pull --ff-only` + re-stow |
 | `just packages` | Update all packages (`yay -Syu`) |
 | `just check` | Validate configs (`hyprctl configerrors` + headless nvim load) |
+| `just lock-pam` | Install the screen-lock PAM stack + faillock policy (`./install.sh --pam`) |
 | `just doctor` | Verify the system matches the repo: git state, symlinks, packages, services, tools |
 
 `just doctor` is the one to run after any change or on a new machine — it exits non-zero and lists everything that drifted.

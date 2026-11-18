@@ -1,0 +1,13 @@
+# PAM stack for the hyprlock screen locker.
+#
+# Deliberately omits pam_faillock. hyprlock runs one PAM conversation per
+# monitor process; when the screen unlocks, the losing processes abort their
+# conversations. pam_faillock counts each abort as a failed login, so a few
+# correct unlocks push the account over `deny` and the lock screen starts
+# rejecting the correct password ("N minutes left to unlock") until the tally
+# is reset. Brute-force throttling still applies to greetd, TTY and sudo.
+#
+# Installed from system/pam.d/hyprlock by `./install.sh --pam` (or --system).
+
+auth        required    pam_unix.so
+account     required    pam_unix.so

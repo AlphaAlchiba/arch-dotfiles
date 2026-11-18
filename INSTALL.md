@@ -196,13 +196,17 @@ MIRROR_COUNTRY=DE ./install.sh --all
 `install.sh` installs the full package list, stows the configs, clones
 Brain_Shell, and sets the login shell to zsh. `--all` additionally runs:
 
-- `--system`: writes `/etc/greetd/config.toml`, enables greetd, enables
-  `fstrim.timer`, enables docker/firewalld/libvirtd/mullvad, adds the user to
-  `docker`/`libvirt`, and sets the firewalld default zone to `home`.
+- `--system`: writes `/etc/greetd/config.toml`, installs the screen-lock PAM
+  stack, enables greetd, enables `fstrim.timer`, enables
+  docker/firewalld/libvirtd/mullvad, adds the user to `docker`/`libvirt`, and
+  sets the firewalld default zone to `home`.
+- `--pam`: only installs `/etc/pam.d/hyprlock` (no `pam_faillock`) and
+  `/etc/security/faillock.conf`, then resets the user's tally. Run
+  `./install.sh --pam` (or `just lock-pam`) on an existing machine.
 - `--tools`: installs uv, rustup, nvm, opencode, tuxedo, and sqlit.
 
-Use `./install.sh` alone for just packages/stow, or `--system` / `--tools`
-individually.
+Use `./install.sh` alone for just packages/stow, or `--system` / `--pam` /
+`--tools` individually.
 
 <details>
 <summary>Manual equivalent of --system</summary>
@@ -223,6 +227,13 @@ sudo systemctl enable --now fstrim.timer
 sudo systemctl enable --now docker firewalld libvirtd mullvad-daemon
 sudo usermod -aG docker,libvirt alpha
 sudo firewall-cmd --set-default-zone=home
+
+# hyprlock must not go through pam_faillock: it runs one PAM conversation per
+# monitor and counts the aborted losers as failed logins, which locks the
+# account on otherwise correct unlocks.
+sudo install -Dm644 system/pam.d/hyprlock /etc/pam.d/hyprlock
+sudo install -Dm644 system/security/faillock.conf /etc/security/faillock.conf
+sudo faillock --user alpha --reset
 ```
 </details>
 

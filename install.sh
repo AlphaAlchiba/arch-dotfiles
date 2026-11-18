@@ -2,10 +2,11 @@
 # =============================================================================
 # Dotfiles Bootstrap Script
 # =============================================================================
-# Usage: cd ~/dotfiles && ./install.sh [--system] [--tools] [--all]
+# Usage: cd ~/dotfiles && ./install.sh [--system] [--pam] [--tools] [--all]
 #
 #   (no flags)  packages + stow + Brain_Shell + user services
-#   --system    configure greetd, enable system services, add groups, firewall zone
+#   --system    configure greetd, screen-lock PAM, system services, groups, firewall
+#   --pam       only install the screen-lock PAM stack and faillock policy
 #   --tools     install uv, rustup, nvm, opencode, tuxedo, sqlit
 #   --all       --system and --tools
 #
@@ -18,6 +19,7 @@
 #   6. Clones Brain_Shell to ~/.local/src/Brain_Shell
 #   7. Enables user systemd services (voxtype, cliphist-wipe)
 #   8. Creates a ~/.opencode-secrets template if missing
+#   9. Installs the screen-lock PAM stack and faillock policy (--pam/--system)
 #
 # Manual steps required after:
 #   - Open nvim and run :lua vim.pack.update()
@@ -39,10 +41,11 @@ err()  { echo -e "${RED}[x]${NC} $1"; exit 1; }
 
 usage() {
     cat <<'EOF'
-Usage: ./install.sh [--system] [--tools] [--all]
+Usage: ./install.sh [--system] [--pam] [--tools] [--all]
 
   (no flags)  install packages, stow dotfiles, clone Brain_Shell, user services
-  --system    configure greetd, enable system services, add groups, firewall zone
+  --system    configure greetd, screen-lock PAM, system services, groups, firewall
+  --pam       only install the screen-lock PAM stack and faillock policy
   --tools     install uv, rustup, nvm, opencode, tuxedo, sqlit
   --all       --system and --tools
 
@@ -51,7 +54,27 @@ Environment:
 EOF
 }
 
+# hyprlock is exempted from pam_faillock (see system/pam.d/hyprlock) because it
+# runs one PAM conversation per monitor and the losing ones are aborted on
+# unlock, which faillock would count as failed logins. The policy file gives a
+# spurious burst enough headroom to be harmless.
+install_pam_stack() {
+    log "Installing screen-lock PAM stack and faillock policy..."
+    local rel dest
+    for rel in pam.d/hyprlock security/faillock.conf; do
+        dest="/etc/$rel"
+        if [ -f "$dest" ] && [ ! -f "$dest.bak" ]; then
+            sudo cp "$dest" "$dest.bak"
+        fi
+        sudo install -Dm644 "$DOTFILES/system/$rel" "$dest"
+    done
+    # Clear whatever the previous stack counted, so the fix applies immediately.
+    sudo faillock --user "$(id -un)" --reset 2>/dev/null || true
+}
+
 setup_system() {
+    install_pam_stack
+
     log "Configuring greetd..."
     if systemctl cat greetd.service >/dev/null 2>&1 && \
        command -v tuigreet >/dev/null 2>&1 && \
@@ -148,16 +171,25 @@ command -v pacman >/dev/null 2>&1 || err "This script requires Arch Linux with p
 
 # ── Options ────────────────────────────────────────────────────────────────
 SETUP_SYSTEM=0
+INSTALL_PAM=0
 INSTALL_TOOLS=0
 for arg in "$@"; do
     case "$arg" in
         --system) SETUP_SYSTEM=1 ;;
+        --pam)    INSTALL_PAM=1 ;;
         --tools)  INSTALL_TOOLS=1 ;;
         --all)    SETUP_SYSTEM=1; INSTALL_TOOLS=1 ;;
         -h|--help) usage; exit 0 ;;
         *) usage >&2; err "Unknown option: $arg" ;;
     esac
 done
+
+# Narrow path for applying the lockout fix on an existing machine without
+# reinstalling packages.
+if [[ $INSTALL_PAM -eq 1 ]]; then
+    install_pam_stack
+    exit 0
+fi
 
 # ── 1. Install yay (AUR helper) ────────────────────────────────────────────
 if ! command -v yay &>/dev/null; then
@@ -301,6 +333,7 @@ echo ""
 
 if [[ $SETUP_SYSTEM -eq 0 ]]; then
     echo "  System setup skipped (rerun with --system to automate):"
+    echo "    screen lock: ./install.sh --pam   # stop faillock locking the account on unlock"
     echo "    greetd:      write /etc/greetd/config.toml and enable greetd"
     echo "    services:    sudo systemctl enable --now fstrim.timer docker firewalld libvirtd mullvad-daemon"
     echo "    groups:      sudo usermod -aG docker,libvirt $(id -un)   # then logout/login"

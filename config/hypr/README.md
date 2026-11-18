@@ -119,6 +119,25 @@ Default policy:
 | 6 min | power the displays off (`hyprctl dispatch dpms off`) |
 | 15 min | suspend (`systemctl suspend`) |
 
+### Lock screen authentication
+
+`hyprlock` authenticates through `/etc/pam.d/hyprlock`, installed from
+`system/pam.d/hyprlock` by `./install.sh --pam` (also `just lock-pam`, or part
+of `--system`). That stack must **not** include `pam_faillock`: hyprlock runs a
+PAM conversation in every monitor process, and when the screen unlocks the
+losing ones abort their conversations. faillock counts each abort as a failed
+login, so with the stock `deny=3` a few correct unlocks lock the account and
+the lock screen then rejects the correct password with "… left to unlock".
+
+The tracked `system/security/faillock.conf` keeps faillock for greetd, TTYs and
+sudo, but with `deny=10` / `unlock_time=60` so a stray burst is harmless and
+short-lived. If the lock screen ever rejects a known-good password:
+
+```bash
+sudo faillock --user "$USER" --reset   # no reboot needed
+journalctl -b | grep -E 'pam_faillock|conversation failed'
+```
+
 ### Per-machine override
 
 Some machines only expose `s2idle` (no S3), and resume can fail to restore a

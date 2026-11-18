@@ -32,6 +32,10 @@ check:
     hyprctl configerrors
     nvim --headless -c 'qa' 2>&1 | head -5
 
+# Install the screen-lock PAM stack + faillock policy (asks for sudo)
+lock-pam:
+    ./install.sh --pam
+
 # Inspect Thunderbolt/USB4 devices, connected displays, and the USB tree
 dock-check:
     #!/usr/bin/env bash
@@ -161,6 +165,24 @@ doctor:
         bad "user service not enabled: $svc"
       fi
     done
+
+    echo "== Screen lock =="
+    if cmp -s system/pam.d/hyprlock /etc/pam.d/hyprlock; then
+      ok "hyprlock PAM stack matches the repo (no pam_faillock)"
+    else
+      bad "/etc/pam.d/hyprlock differs from system/pam.d/hyprlock (run: just lock-pam)"
+    fi
+    if [[ "$(faillock --user "$USER" 2>/dev/null | tail -n +3 | grep -c .)" -gt 0 ]]; then
+      warn "faillock tally has entries (clear with: sudo faillock --user $USER --reset)"
+    else
+      ok "faillock tally empty"
+    fi
+    idle_count=$(pgrep -cx hypridle 2>/dev/null || true)
+    if [[ "${idle_count:-0}" -gt 1 ]]; then
+      bad "$idle_count hypridle instances running (expected 1; log out/in)"
+    else
+      ok "single hypridle instance"
+    fi
 
     echo "== Shell =="
     if [[ "$(getent passwd "$USER" | cut -d: -f7)" == "$(command -v zsh)" ]]; then

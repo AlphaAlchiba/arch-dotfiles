@@ -2,99 +2,257 @@
 description: Deep reasoning and analysis for complex problems — architecture decisions, root cause analysis, tradeoff evaluation
 mode: subagent
 model: opencode-go/deepseek-v4-pro
-temperature: 0.2
 steps: 15
-permission:
-  write: deny
-  edit: deny
-  todowrite: deny
-  task:
-    explore: allow
-    vision: allow
-    security-auditor: allow
-  bash:
-    # Catch-all first; last matching rule wins
-    "*": ask
-    # Destructive
-    "rm *": deny
-    "mv *": deny
-    "sed *": deny
-    "tee *": deny
-    "dd *": deny
-    "chmod *": deny
-    "chown *": deny
-    "kill *": deny
-    "shutdown *": deny
-    "reboot *": deny
-    "mount *": deny
-    "umount *": deny
-    "touch *": deny
-    "mkdir *": deny
-    "rmdir *": deny
-    "tar *": deny
-    "gzip *": deny
-    "bzip2 *": deny
-    "xz *": deny
-    "ln *": deny
-    # Read-only
-    "find *": allow
-    "rg *": allow
-    "grep *": allow
-    # Git: read-only only — mutations denied, never prompted
-    "git *": deny
-    "git status*": allow
-    "git diff*": allow
-    "git log*": allow
-    "git show*": allow
-    "git rev-parse*": allow
-    "git ls-files*": allow
-    "git ls-tree*": allow
-    "git grep*": allow
-    "git blame*": allow
-    "git branch": allow
-    "git branch -a*": allow
-    "git branch -r*": allow
-    "git branch -v*": allow
-    "git branch -l*": allow
-    "git branch --list*": allow
-    "git branch --merged*": allow
-    "git branch --no-merged*": allow
-    "git branch --contains*": allow
-    "git branch --show-current*": allow
-    "git remote*": allow
-    "git remote add*": deny
-    "git remote remove*": deny
-    "git remote set-url*": deny
-    "git remote rename*": deny
-    "git remote update*": deny
-    "git tag": allow
-    "git tag -l*": allow
-    "git tag --list*": allow
-    "git tag -n*": allow
-    "ls *": allow
-    "cat *": allow
-    "head *": allow
-    "tail *": allow
-    "wc *": allow
-    "sort *": allow
-    "uniq *": allow
-    "cut *": allow
-    "awk *": allow
-    "jq *": allow
-    "ps *": allow
-    "df *": allow
-    "du *": allow
-    "which *": allow
-    "pwd *": allow
-    "env *": allow
-    "date *": allow
-    "echo *": allow
-    "printf *": allow
-    "diff *": allow
-    "stat *": allow
-    "file *": allow
-    "strings *": allow
-  webfetch: ask
+permissions:
+  - action: edit
+    resource: "*"
+    effect: deny
+  - action: subagent
+    resource: explore
+    effect: allow
+  - action: subagent
+    resource: vision
+    effect: allow
+  - action: subagent
+    resource: security-auditor
+    effect: allow
+  - action: shell
+    resource: "*"
+    effect: ask
+  # Destructive
+  - action: shell
+    resource: "rm *"
+    effect: deny
+  - action: shell
+    resource: "mv *"
+    effect: deny
+  - action: shell
+    resource: "sed *"
+    effect: deny
+  - action: shell
+    resource: "tee *"
+    effect: deny
+  - action: shell
+    resource: "dd *"
+    effect: deny
+  - action: shell
+    resource: "chmod *"
+    effect: deny
+  - action: shell
+    resource: "chown *"
+    effect: deny
+  - action: shell
+    resource: "kill *"
+    effect: deny
+  - action: shell
+    resource: "shutdown *"
+    effect: deny
+  - action: shell
+    resource: "reboot *"
+    effect: deny
+  - action: shell
+    resource: "mount *"
+    effect: deny
+  - action: shell
+    resource: "umount *"
+    effect: deny
+  - action: shell
+    resource: "touch *"
+    effect: deny
+  - action: shell
+    resource: "mkdir *"
+    effect: deny
+  - action: shell
+    resource: "rmdir *"
+    effect: deny
+  - action: shell
+    resource: "tar *"
+    effect: deny
+  - action: shell
+    resource: "gzip *"
+    effect: deny
+  - action: shell
+    resource: "bzip2 *"
+    effect: deny
+  - action: shell
+    resource: "xz *"
+    effect: deny
+  - action: shell
+    resource: "ln *"
+    effect: deny
+  # Read-only
+  - action: shell
+    resource: "find *"
+    effect: allow
+  - action: shell
+    resource: "rg *"
+    effect: allow
+  - action: shell
+    resource: "grep *"
+    effect: allow
+  # Git: read-only only — mutations denied, never prompted
+  - action: shell
+    resource: "git *"
+    effect: deny
+  - action: shell
+    resource: "git status*"
+    effect: allow
+  - action: shell
+    resource: "git diff*"
+    effect: allow
+  - action: shell
+    resource: "git log*"
+    effect: allow
+  - action: shell
+    resource: "git show*"
+    effect: allow
+  - action: shell
+    resource: "git rev-parse*"
+    effect: allow
+  - action: shell
+    resource: "git ls-files*"
+    effect: allow
+  - action: shell
+    resource: "git ls-tree*"
+    effect: allow
+  - action: shell
+    resource: "git grep*"
+    effect: allow
+  - action: shell
+    resource: "git blame*"
+    effect: allow
+  - action: shell
+    resource: "git branch"
+    effect: allow
+  - action: shell
+    resource: "git branch -a*"
+    effect: allow
+  - action: shell
+    resource: "git branch -r*"
+    effect: allow
+  - action: shell
+    resource: "git branch -v*"
+    effect: allow
+  - action: shell
+    resource: "git branch -l*"
+    effect: allow
+  - action: shell
+    resource: "git branch --list*"
+    effect: allow
+  - action: shell
+    resource: "git branch --merged*"
+    effect: allow
+  - action: shell
+    resource: "git branch --no-merged*"
+    effect: allow
+  - action: shell
+    resource: "git branch --contains*"
+    effect: allow
+  - action: shell
+    resource: "git branch --show-current*"
+    effect: allow
+  - action: shell
+    resource: "git remote*"
+    effect: allow
+  - action: shell
+    resource: "git remote add*"
+    effect: deny
+  - action: shell
+    resource: "git remote remove*"
+    effect: deny
+  - action: shell
+    resource: "git remote set-url*"
+    effect: deny
+  - action: shell
+    resource: "git remote rename*"
+    effect: deny
+  - action: shell
+    resource: "git remote update*"
+    effect: deny
+  - action: shell
+    resource: "git tag"
+    effect: allow
+  - action: shell
+    resource: "git tag -l*"
+    effect: allow
+  - action: shell
+    resource: "git tag --list*"
+    effect: allow
+  - action: shell
+    resource: "git tag -n*"
+    effect: allow
+  - action: shell
+    resource: "ls *"
+    effect: allow
+  - action: shell
+    resource: "cat *"
+    effect: allow
+  - action: shell
+    resource: "head *"
+    effect: allow
+  - action: shell
+    resource: "tail *"
+    effect: allow
+  - action: shell
+    resource: "wc *"
+    effect: allow
+  - action: shell
+    resource: "sort *"
+    effect: allow
+  - action: shell
+    resource: "uniq *"
+    effect: allow
+  - action: shell
+    resource: "cut *"
+    effect: allow
+  - action: shell
+    resource: "awk *"
+    effect: allow
+  - action: shell
+    resource: "jq *"
+    effect: allow
+  - action: shell
+    resource: "ps *"
+    effect: allow
+  - action: shell
+    resource: "df *"
+    effect: allow
+  - action: shell
+    resource: "du *"
+    effect: allow
+  - action: shell
+    resource: "which *"
+    effect: allow
+  - action: shell
+    resource: "pwd *"
+    effect: allow
+  - action: shell
+    resource: "env *"
+    effect: allow
+  - action: shell
+    resource: "date *"
+    effect: allow
+  - action: shell
+    resource: "echo *"
+    effect: allow
+  - action: shell
+    resource: "printf *"
+    effect: allow
+  - action: shell
+    resource: "diff *"
+    effect: allow
+  - action: shell
+    resource: "stat *"
+    effect: allow
+  - action: shell
+    resource: "file *"
+    effect: allow
+  - action: shell
+    resource: "strings *"
+    effect: allow
+  - action: webfetch
+    resource: "*"
+    effect: ask
 ---
 
 You are a deep reasoning agent. You are called when a problem demands thorough analysis — not quick answers. Think step by step, surface hidden assumptions, and communicate clearly.

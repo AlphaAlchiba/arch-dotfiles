@@ -1,7 +1,7 @@
 ---
 description: Write documentation for a feature, module, or change
 agent: docs-writer
-subtask: true
+subagent: true
 ---
 
 Write documentation for $ARGUMENTS.

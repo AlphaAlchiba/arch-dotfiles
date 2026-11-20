@@ -1,118 +1,150 @@
 {
   "$schema": "https://opencode.ai/config.json",
-  "permission": {
-    "bash": "ask",
-    "edit": "ask",
-    "websearch": "deny"
-  },
-  "autoupdate": true,
+  "permissions": [
+    { "action": "shell", "resource": "*", "effect": "ask" },
+    { "action": "edit", "resource": "*", "effect": "ask" },
+    { "action": "websearch", "resource": "*", "effect": "deny" },
+    // V1 asked before accessing paths outside the project; V2 allows by default.
+    { "action": "external_directory", "resource": "*", "effect": "ask" }
+  ],
+  "update": "notify",
   "instructions": ["instructions/*.md"],
   "default_agent": "plan",
-  "agent": {
+  "agents": {
     "explore": {
-      "permission": {
-        "bash": {
-          // last matching rule wins: catch-all first, specific rules after
-          "*": "ask",
-          "rm *": "deny",
-          "mv *": "deny",
-          "sed *": "deny",
-          "tee *": "deny",
-          "dd *": "deny",
-          "chmod *": "deny",
-          "chown *": "deny",
-          "kill *": "deny",
-          "shutdown *": "deny",
-          "reboot *": "deny",
-          "mount *": "deny",
-          "umount *": "deny",
-          "touch *": "deny",
-          "mkdir *": "deny",
-          "rmdir *": "deny",
-          "tar *": "deny",
-          "gzip *": "deny",
-          "bzip2 *": "deny",
-          "xz *": "deny",
-          "ln *": "deny",
-          "find *": "allow",
-          "rg *": "allow",
-          "grep *": "allow",
-          // Git: read-only only — mutations denied, never prompted
-          "git *": "deny",
-          "git status*": "allow",
-          "git diff*": "allow",
-          "git log*": "allow",
-          "git show*": "allow",
-          "git rev-parse*": "allow",
-          "git ls-files*": "allow",
-          "git ls-tree*": "allow",
-          "git grep*": "allow",
-          "git blame*": "allow",
-          "git branch": "allow",
-          "git branch -a*": "allow",
-          "git branch -r*": "allow",
-          "git branch -v*": "allow",
-          "git branch -l*": "allow",
-          "git branch --list*": "allow",
-          "git branch --merged*": "allow",
-          "git branch --no-merged*": "allow",
-          "git branch --contains*": "allow",
-          "git branch --show-current*": "allow",
-          "git remote*": "allow",
-          "git remote add*": "deny",
-          "git remote remove*": "deny",
-          "git remote set-url*": "deny",
-          "git remote rename*": "deny",
-          "git remote update*": "deny",
-          "git tag": "allow",
-          "git tag -l*": "allow",
-          "git tag --list*": "allow",
-          "git tag -n*": "allow",
-          "ls *": "allow",
-          "cat *": "allow",
-          "head *": "allow",
-          "tail *": "allow",
-          "wc *": "allow",
-          "sort *": "allow",
-          "uniq *": "allow",
-          "cut *": "allow",
-          "awk *": "allow",
-          "jq *": "allow",
-          "ps *": "allow",
-          "df *": "allow",
-          "du *": "allow",
-          "which *": "allow",
-          "pwd *": "allow",
-          "env *": "allow",
-          "date *": "allow",
-          "echo *": "allow",
-          "printf *": "allow",
-          "diff *": "allow",
-          "stat *": "allow",
-          "file *": "allow",
-          "strings *": "allow"
+      "permissions": [
+        // last matching rule wins: catch-all first, specific rules after
+        { "action": "shell", "resource": "*", "effect": "ask" },
+        { "action": "shell", "resource": "rm *", "effect": "deny" },
+        { "action": "shell", "resource": "mv *", "effect": "deny" },
+        { "action": "shell", "resource": "sed *", "effect": "deny" },
+        { "action": "shell", "resource": "tee *", "effect": "deny" },
+        { "action": "shell", "resource": "dd *", "effect": "deny" },
+        { "action": "shell", "resource": "chmod *", "effect": "deny" },
+        { "action": "shell", "resource": "chown *", "effect": "deny" },
+        { "action": "shell", "resource": "kill *", "effect": "deny" },
+        { "action": "shell", "resource": "shutdown *", "effect": "deny" },
+        { "action": "shell", "resource": "reboot *", "effect": "deny" },
+        { "action": "shell", "resource": "mount *", "effect": "deny" },
+        { "action": "shell", "resource": "umount *", "effect": "deny" },
+        { "action": "shell", "resource": "touch *", "effect": "deny" },
+        { "action": "shell", "resource": "mkdir *", "effect": "deny" },
+        { "action": "shell", "resource": "rmdir *", "effect": "deny" },
+        { "action": "shell", "resource": "tar *", "effect": "deny" },
+        { "action": "shell", "resource": "gzip *", "effect": "deny" },
+        { "action": "shell", "resource": "bzip2 *", "effect": "deny" },
+        { "action": "shell", "resource": "xz *", "effect": "deny" },
+        { "action": "shell", "resource": "ln *", "effect": "deny" },
+        // Read-only
+        { "action": "shell", "resource": "find *", "effect": "allow" },
+        { "action": "shell", "resource": "rg *", "effect": "allow" },
+        { "action": "shell", "resource": "grep *", "effect": "allow" },
+        // Git: read-only only — mutations denied, never prompted
+        { "action": "shell", "resource": "git *", "effect": "deny" },
+        { "action": "shell", "resource": "git status*", "effect": "allow" },
+        { "action": "shell", "resource": "git diff*", "effect": "allow" },
+        { "action": "shell", "resource": "git log*", "effect": "allow" },
+        { "action": "shell", "resource": "git show*", "effect": "allow" },
+        { "action": "shell", "resource": "git rev-parse*", "effect": "allow" },
+        { "action": "shell", "resource": "git ls-files*", "effect": "allow" },
+        { "action": "shell", "resource": "git ls-tree*", "effect": "allow" },
+        { "action": "shell", "resource": "git grep*", "effect": "allow" },
+        { "action": "shell", "resource": "git blame*", "effect": "allow" },
+        { "action": "shell", "resource": "git branch", "effect": "allow" },
+        { "action": "shell", "resource": "git branch -a*", "effect": "allow" },
+        { "action": "shell", "resource": "git branch -r*", "effect": "allow" },
+        { "action": "shell", "resource": "git branch -v*", "effect": "allow" },
+        { "action": "shell", "resource": "git branch -l*", "effect": "allow" },
+        { "action": "shell", "resource": "git branch --list*", "effect": "allow" },
+        { "action": "shell", "resource": "git branch --merged*", "effect": "allow" },
+        { "action": "shell", "resource": "git branch --no-merged*", "effect": "allow" },
+        { "action": "shell", "resource": "git branch --contains*", "effect": "allow" },
+        { "action": "shell", "resource": "git branch --show-current*", "effect": "allow" },
+        { "action": "shell", "resource": "git remote*", "effect": "allow" },
+        { "action": "shell", "resource": "git remote add*", "effect": "deny" },
+        { "action": "shell", "resource": "git remote remove*", "effect": "deny" },
+        { "action": "shell", "resource": "git remote set-url*", "effect": "deny" },
+        { "action": "shell", "resource": "git remote rename*", "effect": "deny" },
+        { "action": "shell", "resource": "git remote update*", "effect": "deny" },
+        { "action": "shell", "resource": "git tag", "effect": "allow" },
+        { "action": "shell", "resource": "git tag -l*", "effect": "allow" },
+        { "action": "shell", "resource": "git tag --list*", "effect": "allow" },
+        { "action": "shell", "resource": "git tag -n*", "effect": "allow" },
+        { "action": "shell", "resource": "ls *", "effect": "allow" },
+        { "action": "shell", "resource": "cat *", "effect": "allow" },
+        { "action": "shell", "resource": "head *", "effect": "allow" },
+        { "action": "shell", "resource": "tail *", "effect": "allow" },
+        { "action": "shell", "resource": "wc *", "effect": "allow" },
+        { "action": "shell", "resource": "sort *", "effect": "allow" },
+        { "action": "shell", "resource": "uniq *", "effect": "allow" },
+        { "action": "shell", "resource": "cut *", "effect": "allow" },
+        { "action": "shell", "resource": "awk *", "effect": "allow" },
+        { "action": "shell", "resource": "jq *", "effect": "allow" },
+        { "action": "shell", "resource": "ps *", "effect": "allow" },
+        { "action": "shell", "resource": "df *", "effect": "allow" },
+        { "action": "shell", "resource": "du *", "effect": "allow" },
+        { "action": "shell", "resource": "which *", "effect": "allow" },
+        { "action": "shell", "resource": "pwd *", "effect": "allow" },
+        { "action": "shell", "resource": "env *", "effect": "allow" },
+        { "action": "shell", "resource": "date *", "effect": "allow" },
+        { "action": "shell", "resource": "echo *", "effect": "allow" },
+        { "action": "shell", "resource": "printf *", "effect": "allow" },
+        { "action": "shell", "resource": "diff *", "effect": "allow" },
+        { "action": "shell", "resource": "stat *", "effect": "allow" },
+        { "action": "shell", "resource": "file *", "effect": "allow" },
+        { "action": "shell", "resource": "strings *", "effect": "allow" }
+      ]
+    },
+    "title": {
+      "model": "opencode-go/deepseek-v4.1-flash"
+    }
+  },
+  "compaction": {
+    "auto": true,
+    "keep": { "tokens": 15000 },
+    "buffer": "15%"
+  },
+  "experimental": {
+    // V2 defaults to no nested subagents; deepthinking delegates to explore/vision.
+    "subagent_depth": 2
+  },
+  "providers": {
+    "opencode-go": {
+      "models": {
+        "deepseek-v4.1-flash": {
+          "variants": [
+            { "id": "precise", "body": { "thinking": { "type": "disabled" }, "temperature": 0.1 } },
+            { "id": "docs", "body": { "thinking": { "type": "disabled" }, "temperature": 0.15 } },
+            { "id": "balanced", "body": { "thinking": { "type": "disabled" }, "temperature": 0.2 } }
+          ]
+        },
+        "kimi-k3.1-pro": {
+          "variants": [
+            { "id": "precise", "body": { "temperature": 0.1 } }
+          ]
         }
       }
     }
   },
-  "small_model": "opencode-go/deepseek-v4-flash",
-  "compaction": { "auto": true, "tail_turns": 15 },
   "mcp": {
-    "context7": {
-      "type": "remote",
-      "url": "https://mcp.context7.com/mcp",
-      "headers": {
-        "CONTEXT7_API_KEY": "{env:CONTEXT7_API_KEY}"
+    "servers": {
+      "context7": {
+        "type": "remote",
+        "url": "https://mcp.context7.com/mcp",
+        "oauth": false,
+        "codemode": false,
+        "headers": {
+          "CONTEXT7_API_KEY": "{env:CONTEXT7_API_KEY}"
+        }
       },
-      "enabled": true
-    },
-    "brave-search": {
-      "type": "local",
-      "command": ["npx", "-y", "@brave/brave-search-mcp-server"],
-      "enabled": true,
-      "environment": {
-        "BRAVE_API_KEY": "{env:BRAVE_API_KEY}",
-        "BRAVE_MCP_ENABLED_TOOLS": "brave_web_search"
+      "brave-search": {
+        "type": "local",
+        "command": ["npx", "-y", "@brave/brave-search-mcp-server"],
+        "codemode": false,
+        "environment": {
+          "BRAVE_API_KEY": "{env:BRAVE_API_KEY}",
+          "BRAVE_MCP_ENABLED_TOOLS": "brave_web_search"
+        }
       }
     }
   },

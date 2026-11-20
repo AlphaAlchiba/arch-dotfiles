@@ -1,7 +1,7 @@
 ---
 description: Security audit of staged changes or a specific file/path
 agent: security-auditor
-subtask: true
+subagent: true
 ---
 
 Audit $ARGUMENTS for security vulnerabilities.

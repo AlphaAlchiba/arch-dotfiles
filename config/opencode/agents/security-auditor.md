@@ -2,14 +2,20 @@
 description: Audits code for security vulnerabilities and sensitive data exposure
 mode: subagent
 model: opencode-go/deepseek-v4-pro
-temperature: 0.1
 steps: 8
-permission:
-  write: deny
-  edit: deny
-  bash: deny
-  task: deny
-  webfetch: allow
+permissions:
+  - action: edit
+    resource: "*"
+    effect: deny
+  - action: shell
+    resource: "*"
+    effect: deny
+  - action: subagent
+    resource: "*"
+    effect: deny
+  - action: webfetch
+    resource: "*"
+    effect: allow
 ---
 
 You are a security auditing agent. Your role is to identify security vulnerabilities, data exposure risks, and bad security practices in code.

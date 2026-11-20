@@ -66,6 +66,14 @@ alias 2='cd -2'
 alias 3='cd -3'
 alias 4='cd -4'
 
+# cd + ls: change directory, then list it. A function (not an alias) so the
+# target directory is forwarded to cd. Aborts on a failed cd so we never list
+# the directory we just failed to leave.
+cs() {
+  cd -- "$@" || return
+  ls
+}
+
 # --- 4. Aliases (Modern Tools) ---
 
 # Tree command ignore pattern

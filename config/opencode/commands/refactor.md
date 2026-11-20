@@ -1,7 +1,7 @@
 ---
 description: Safely refactor code without changing behavior
 agent: refactor
-subtask: true
+subagent: true
 ---
 
 Refactor $ARGUMENTS for clarity and maintainability without changing behavior.

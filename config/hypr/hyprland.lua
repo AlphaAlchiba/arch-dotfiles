@@ -110,7 +110,8 @@ hl.config({
 		kb_layout = "us,us",
 		kb_variant = ",intl",
 		kb_model = "",
-		kb_options = "caps:swapescape,grp:ctrl_alt_toggle",
+		-- kb_options = "caps:swapescape,grp:ctrl_alt_toggle",
+		kb_options = "grp:ctrl_alt_toggle",
 		kb_rules = "",
 
 		follow_mouse = 1,

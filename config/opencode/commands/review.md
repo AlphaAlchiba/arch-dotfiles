@@ -1,7 +1,7 @@
 ---
 description: Review staged and unstaged changes for code quality and best practices
 agent: review
-subtask: true
+subagent: true
 ---
 
 Review all staged changes (`git diff --cached`) and unstaged changes (`git diff`) for code quality and best practices.

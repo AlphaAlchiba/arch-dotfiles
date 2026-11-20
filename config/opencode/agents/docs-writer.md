@@ -1,15 +1,21 @@
 ---
 description: Writes and maintains project documentation
 mode: subagent
-model: opencode-go/deepseek-v4-flash
-temperature: 0.15
+model: opencode-go/deepseek-v4.1-flash#docs
 steps: 12
-permission:
-  write: ask
-  edit: ask
-  bash: ask
-  task: deny
-  webfetch: allow
+permissions:
+  - action: edit
+    resource: "*"
+    effect: ask
+  - action: shell
+    resource: "*"
+    effect: ask
+  - action: subagent
+    resource: "*"
+    effect: deny
+  - action: webfetch
+    resource: "*"
+    effect: allow
 ---
 
 You are a documentation writing agent. Your role is to write and maintain clear, concise project documentation.

@@ -1,15 +1,21 @@
 ---
 description: Reviews code for quality, potential bugs, and best practices
 mode: subagent
-model: opencode-go/deepseek-v4-flash
-temperature: 0.1
+model: opencode-go/deepseek-v4.1-flash#precise
 steps: 8
-permission:
-  edit: deny
-  write: deny
-  bash: deny
-  task: deny
-  webfetch: allow
+permissions:
+  - action: edit
+    resource: "*"
+    effect: deny
+  - action: shell
+    resource: "*"
+    effect: deny
+  - action: subagent
+    resource: "*"
+    effect: deny
+  - action: webfetch
+    resource: "*"
+    effect: allow
 ---
 
 You are a code review agent. You analyze staged and unstaged changes for quality issues, bugs, and best practices. You do not make any edits.

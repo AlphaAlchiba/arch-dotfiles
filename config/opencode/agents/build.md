@@ -1,17 +1,24 @@
 ---
 description: Implement changes to the codebase
 mode: primary
-model: opencode-go/deepseek-v4-flash
-temperature: 0.1
-permission:
-  write: ask
-  edit: ask
-  task: ask
-  bash:
-    # Always ask for git operations (and everything else)
-    "*": ask
-    "git *": ask
-  webfetch: allow
+model: opencode-go/deepseek-v4.1-flash#precise
+permissions:
+  - action: edit
+    resource: "*"
+    effect: ask
+  - action: subagent
+    resource: "*"
+    effect: ask
+  - action: shell
+    resource: "*"
+    effect: ask
+  # Always ask for git operations (and everything else)
+  - action: shell
+    resource: "git *"
+    effect: ask
+  - action: webfetch
+    resource: "*"
+    effect: allow
 ---
 
 You are an implementation agent. Your role is to implement plans from the plan agent and fix issues by writing code, creating tests, and managing git workflow.

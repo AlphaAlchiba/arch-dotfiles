@@ -1,22 +1,33 @@
 ---
 description: Analyze images, screenshots, diagrams, and visual content
 mode: subagent
-model: opencode-go/kimi-k2.6
-temperature: 0.1
+model: opencode-go/kimi-k3.1-pro#precise
 steps: 8
-permission:
-  read: deny
-  list: deny
-  grep: deny
-  glob: deny
-  lsp: deny
-  edit: deny
-  write: deny
-  bash: deny
-  task: deny
-  git: deny
-  webfetch: deny
-  websearch: deny
+permissions:
+  - action: read
+    resource: "*"
+    effect: deny
+  - action: grep
+    resource: "*"
+    effect: deny
+  - action: glob
+    resource: "*"
+    effect: deny
+  - action: edit
+    resource: "*"
+    effect: deny
+  - action: shell
+    resource: "*"
+    effect: deny
+  - action: subagent
+    resource: "*"
+    effect: deny
+  - action: webfetch
+    resource: "*"
+    effect: deny
+  - action: websearch
+    resource: "*"
+    effect: deny
 ---
 
 You are a vision analysis agent. Your role is to analyze images, screenshots, diagrams, error dialogs, and any visual content. You do not read or modify code.

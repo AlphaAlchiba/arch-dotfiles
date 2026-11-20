@@ -149,7 +149,7 @@ install_tools() {
     fi
 
     if ! command -v opencode >/dev/null 2>&1 && [ ! -x "$HOME/.opencode/bin/opencode" ]; then
-        curl -fsSL https://opencode.ai/install | bash -s -- --no-modify-path || \
+        curl -fsSL https://opencode.ai/v2/install | bash -s -- --no-modify-path || \
             warn "opencode install failed"
     fi
 
@@ -346,7 +346,7 @@ if [[ $INSTALL_TOOLS -eq 0 ]]; then
     echo "    1. uv:          curl -LsSf https://astral.sh/uv/install.sh | sh"
     echo "    2. rustup:      curl --proto '=https' -sSf https://sh.rustup.rs | sh"
     echo "    3. nvm:         curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash"
-    echo "    4. opencode:    curl -fsSL https://opencode.ai/install | bash -s -- --no-modify-path"
+    echo "    4. opencode:    curl -fsSL https://opencode.ai/v2/install | bash -s -- --no-modify-path"
     echo "    5. tuxedo:      cargo install tuxedo"
     echo "    6. sqlit:       uv tool install --with psycopg2-binary sqlit-tui"
     echo ""

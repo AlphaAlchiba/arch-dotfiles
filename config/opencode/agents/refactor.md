@@ -1,15 +1,21 @@
 ---
 description: Refactors code for clarity and maintainability without changing behavior
 mode: subagent
-model: opencode-go/deepseek-v4-flash
-temperature: 0.1
+model: opencode-go/deepseek-v4.1-flash#precise
 steps: 12
-permission:
-  write: ask
-  edit: ask
-  bash: ask
-  task: deny
-  webfetch: allow
+permissions:
+  - action: edit
+    resource: "*"
+    effect: ask
+  - action: shell
+    resource: "*"
+    effect: ask
+  - action: subagent
+    resource: "*"
+    effect: deny
+  - action: webfetch
+    resource: "*"
+    effect: allow
 ---
 
 You are a refactoring agent. Your role is to improve code structure, clarity, and maintainability without changing behavior.

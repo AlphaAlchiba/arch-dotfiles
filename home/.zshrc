@@ -289,9 +289,10 @@ export FZF_DEFAULT_OPTS="$FZF_DEFAULT_OPTS \
 
 # API keys, tokens, and cloud project ids live in ~/.opencode-secrets (untracked).
 [ -f "$HOME/.opencode-secrets" ] && source "$HOME/.opencode-secrets"
-export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
+
+# Node/npm come from the system packages (nodejs, npm). nvm is intentionally
+# not sourced: it added ~57ms to every shell (86% of startup) while managing
+# no installed versions. Re-add the NVM_DIR block if you ever need it.
 
 # --- 6. FZF Integration ---
 source /usr/share/fzf/key-bindings.zsh

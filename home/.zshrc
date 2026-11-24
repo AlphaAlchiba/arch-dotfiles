@@ -42,6 +42,15 @@ bindkey "^[OB" down-line-or-beginning-search
 # Ctrl+Backspace: delete previous word (matches Kitty CSI-u sequence)
 bindkey '^[[127;5u' backward-kill-word
 
+# Ctrl+arrows / Ctrl+Delete: Kitty sends legacy xterm sequences (no CSI-u unless
+# the app requests it), which zsh has no default binding for. Without these the
+# trailing letter leaks into the buffer (Ctrl+Left types "D", Ctrl+Right "C").
+bindkey '^[[1;5D' backward-word
+bindkey '^[[1;5C' forward-word
+bindkey '^[[1;5A' beginning-of-line
+bindkey '^[[1;5B' end-of-line
+bindkey '^[[3;5~' kill-word
+
 # --- 3. Navigation Pro-Tips ---
 # Global Aliases (type ... and it becomes ../..)
 alias -g ...='../..'

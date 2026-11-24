@@ -2,12 +2,14 @@
 # Full annotated reference: https://voxtype.io/docs/CONFIGURATION
 
 state_file = "auto"
+engine = "whisper"
 
 [hotkey]
 # Built-in hotkey disabled — Hyprland keybindings (Super+R) control recording
 enabled = false
 key = "SCROLLLOCK"
 modifiers = []
+mode = "push_to_talk"
 
 [audio]
 device = "default"
@@ -16,25 +18,41 @@ max_duration_secs = 60
 # Pause MPRIS media players (Spotify, Firefox, etc.) while dictating,
 # resume them when recording stops. Requires playerctl.
 pause_media = true
+# duck_media is the alternative to pause_media: lower other streams instead of
+# stopping them. Left off because pause_media already handles it.
+duck_media = false
+duck_media_volume_percent = 34
+duck_media_fade_ms = 150
 
 [audio.feedback]
 enabled = true
 theme = "subtle"
-volume = 0.4
+volume = 0.1
 
 [whisper]
 # Multilingual EN/FR alternative (slower, can misdetect mixed speech):
 # model = "small"
 # language = ["en", "fr"]
-model = "small.en"     # English-only — fastest, best for English dictation
+model = "large-v3-turbo"   # Best accuracy/speed tradeoff; needs GPU to be fast
 language = "en"
 translate = false
-# Use the NVIDIA dGPU (index 1) for Vulkan inference, not the Intel iGPU (index 0)
-gpu_device = 1
+# Flash-attention kernels: faster on GPUs that support them. The Radeon 780M
+# reports KHR_coopmat, so this is a win here and on the NVIDIA laptop.
+flash_attention = true
+# gpu_device is intentionally unset: voxtype uses the first GPU, which is
+# correct on every machine (Radeon iGPU here, NVIDIA dGPU on the laptop).
+# Only set it on hosts with multiple GPUs where the first is the wrong one.
 # Faster transcription for short dictations (smaller context window for clips <22.5s)
 context_window_optimization = true
-# Experimental streaming — types ~5s chunks while speaking, but cuts sentences
-# at chunk boundaries and adds "..." artifacts. Disabled: clean all-at-once output.
+mode = "local"
+on_demand_loading = false
+gpu_isolation = false
+# Streaming: types text incrementally while speaking via sliding-window
+# re-transcription. Tried and rejected — rewrites text mid-stream, jarring.
+# streaming = true
+# Alternative: eager_processing transcribes overlapping chunks while you speak
+# but emits one clean block at the end. Tried and rejected on small.en/CPU
+# (cut sentences at chunk boundaries, added "..." artifacts).
 # eager_processing = true
 # eager_chunk_secs = 5.0
 # eager_overlap_secs = 0.5
@@ -52,6 +70,10 @@ on_transcription = false
 [text]
 spoken_punctuation = true
 filter_filler_words = true
+# Remove self-corrections ("I want to— I want to go"), stutters, and
+# "scratch that" retractions. Whisper transcribes disfluencies faithfully,
+# so this strips your own restarts back out.
+collapse_restarts = true
 
 [vad]
 enabled = true

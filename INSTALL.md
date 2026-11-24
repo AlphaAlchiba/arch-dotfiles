@@ -245,19 +245,36 @@ home, `git pull` and rerun `./install.sh --all`: the script now creates
 
 ## 11. AMD / voxtype
 
-The tracked `config/voxtype/config.toml` uses `gpu_device = 1` (the laptop's
-NVIDIA dGPU). On the mini PC, set it to `0` for the Radeon iGPU:
+`config/voxtype/config.toml` deliberately leaves `gpu_device` unset, so voxtype
+uses the first GPU it finds. That is correct on every machine in this repo:
+the Radeon iGPU on the mini PC, the NVIDIA dGPU on the laptop. Only set it on a
+host with multiple GPUs where the first one is the wrong choice:
 
 ```bash
-nvim ~/.config/voxtype/config.toml   # gpu_device = 0
+voxtype config set whisper.gpu_device 1
 ```
 
-Because `~/.config/voxtype` is a symlink into the repo, this shows as a local
-modification. Either commit `gpu_device = 0` if the mini PC is the primary
-machine, or keep the change local. Do not set `1` here — there is no dGPU.
+The default model is `large-v3-turbo`. It is fast on a dGPU and usable on the
+Radeon 780M, but on a 3 GB iGPU it is close to the VRAM limit. If dictation
+stutters or the journal shows allocation failures, drop to `small.en`:
 
-`vulkan-radeon` and `vulkan-icd-loader` are installed in the base step, so
-voxtype can use Vulkan.
+```bash
+voxtype config set whisper.model small.en
+```
+
+Note that `~/.config/voxtype` is a symlink into the repo, so either command
+shows as a local modification. That is expected for a per-machine override.
+
+GPU acceleration is a per-machine install step, not a repo setting. The Vulkan
+binary covers AMD, NVIDIA, and Intel in one build:
+
+```bash
+sudo voxtype setup gpu --enable
+voxtype info accel          # must not say "cpu-only"
+```
+
+`vulkan-radeon` and `vulkan-icd-loader` are installed in the base step for AMD
+hosts; NVIDIA hosts need `nvidia-utils` instead.
 
 ## 12. Monitor configuration
 

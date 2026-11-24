@@ -1,0 +1,14 @@
+# glow configuration — managed via dotfiles (stowed to ~/.config/glow)
+#
+# Style: dracula. glow's built-in "dark" style renders all body text in one
+# flat near-white (252), which reads as an unbroken wall on a black terminal.
+# dracula gives headings, bold, italic and code distinct truecolor values.
+#
+# Note: glow only honours this file's style when stdout is a TTY. When output
+# is piped it silently falls back to the colorless "notty" style, so the `??`
+# helper in .zshrc passes `-s dracula` explicitly.
+style: "dracula"
+mouse: false
+pager: false
+width: 80
+all: false

@@ -168,8 +168,76 @@ alias lg='lazygit'
 alias grep='grep --color=auto'
 alias g='gemini'
 alias oc='opencode'
-_gq() { gemini --raw-output --accept-raw-output-risk --approval-mode plan -p "Answer concisely: $*" | uvx --with rich python3 -m rich.markdown - }
-alias '??'='noglob _gq'
+# Reload this file in the current shell (picks up edits without a new terminal)
+alias reload='source ~/.zshrc'
+
+# --- 4e. Quick Ask (opencode) ---
+# `?? <question>` asks opencode and renders the answer as markdown.
+#   - Keeps a session id in ~/.cache/opencode-ask/session so follow-up
+#     questions remember earlier turns. `?? --new` starts a fresh session.
+#   - Uses the flash model with the build agent: the plan agent adds ~3s of
+#     planning overhead that a one-shot question does not need.
+#   - glow renders the markdown; it is a single binary, unlike the old
+#     uvx+python+rich pipeline.
+_ask() {
+  local cache="${XDG_CACHE_HOME:-$HOME/.cache}/opencode-ask"
+  local sid_file="$cache/session"
+  local model="opencode-go/deepseek-v4.1-flash"
+  local sid=""
+
+  mkdir -p "$cache"
+
+  if [[ "$1" == "--new" ]]; then
+    shift
+    rm -f "$sid_file"
+  elif [[ -f "$sid_file" ]]; then
+    sid=$(<"$sid_file")
+  fi
+
+  if [[ $# -eq 0 ]]; then
+    print -u2 "usage: ?? <question>   (?? --new <question> to reset memory)"
+    return 1
+  fi
+
+  # Ask for a short but complete answer; the model otherwise rambles.
+  # The formatting hint matters: a wall of plain text is hard to scan in a
+  # terminal, so ask for light markdown structure without turning it into a
+  # heading-heavy document.
+  local prompt="Answer this concisely but completely. Use light markdown formatting so it is easy to scan in a terminal: short paragraphs or bullets, and bold for key terms. Keep it subtle — no big headings, no tables, no horizontal rules. No preamble, no restating the question. Question: $*"
+
+  local -a args=(run --agent build --model "$model" --format json)
+  [[ -n "$sid" ]] && args+=(--session "$sid")
+
+  local out
+  out=$(opencode "${args[@]}" "$prompt" 2>&1) || {
+    print -u2 "opencode failed:"
+    print -u2 -- "$out"
+    return 1
+  }
+
+  # Remember the session so the next call continues this conversation.
+  local new_sid
+  new_sid=$(print -r -- "$out" | jq -r 'select(.sessionID) | .sessionID' 2>/dev/null | head -1)
+  [[ -n "$new_sid" ]] && print -r -- "$new_sid" >"$sid_file"
+
+  local text
+  text=$(print -r -- "$out" | jq -r 'select(.type=="text") | .part.text' 2>/dev/null)
+  if [[ -z "$text" ]]; then
+    print -u2 "no answer returned"
+    return 1
+  fi
+
+  # glow must do the wrapping itself: with -w 0 the terminal wraps the line and
+  # continuation lines lose the bullet indent. -w N keeps the hanging indent
+  # aligned. It pads each line with trailing spaces, which are invisible.
+  # The style must be passed explicitly: glow ignores the config's style when
+  # stdout is a pipe and falls back to the colorless "notty" style.
+  local width
+  width=$(tput cols 2>/dev/null || echo 100)
+  [[ -z "$width" || "$width" -lt 40 ]] && width=100
+  print -r -- "$text" | glow -s dracula -w "$width"
+}
+alias '??'='noglob _ask'
 
 # --- 4a. Git Aliases ---
 alias gst='git status'

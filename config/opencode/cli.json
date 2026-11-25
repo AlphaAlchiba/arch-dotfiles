@@ -12,13 +12,16 @@
   },
   "keybinds": {
     "agent.cycle": "tab",
-    "agent.cycle.reverse": "shift+tab"
+    "agent.cycle.reverse": "shift+tab",
+    "session.verbosity.cycle": "ctrl+alt+v",
+    "session.toggle.exploration_grouping": "ctrl+alt+g"
   },
   "animations": true,
   "session": {
     "sidebar": "auto",
     "scrollbar": true,
     "thinking": "show",
+    "grouping": "none",
     "new_location": "launch"
   },
   "prompt": {

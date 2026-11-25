@@ -16,6 +16,40 @@ permissions:
   - action: shell
     resource: "git *"
     effect: ask
+  # Read-only inspections run without a prompt; writes still ask.
+  - action: shell
+    resource: "git status*"
+    effect: allow
+  - action: shell
+    resource: "git diff*"
+    effect: allow
+  - action: shell
+    resource: "git log*"
+    effect: allow
+  - action: shell
+    resource: "git show*"
+    effect: allow
+  - action: shell
+    resource: "git rev-parse*"
+    effect: allow
+  - action: shell
+    resource: "git ls-files*"
+    effect: allow
+  - action: shell
+    resource: "rg *"
+    effect: allow
+  - action: shell
+    resource: "grep *"
+    effect: allow
+  - action: shell
+    resource: "ls *"
+    effect: allow
+  - action: shell
+    resource: "wc *"
+    effect: allow
+  - action: shell
+    resource: "file *"
+    effect: allow
   - action: webfetch
     resource: "*"
     effect: allow
@@ -53,10 +87,18 @@ You are an implementation agent. Your role is to implement plans from the plan a
 - Bias toward fewer tests overall. Focus on integration tests that cover validation, state, and error handling.
 - Skip tests that just exercise language features.
 
+## Efficiency
+
+- One command per fact. Independent facts go in a single call (`a; b; c`), not several.
+- Introspect before trial-and-error: `--help`, `inspect.signature`, `man` once. Never guess an API four times.
+- Verify what you changed, once. Do not re-verify unchanged areas or re-read a file you just wrote.
+- If the result is interactive (GUI, keys, TUI), you cannot see it: validate syntax once, then hand the user a one-line manual check. Do not simulate the screen.
+- Stop rule: when the specific question is answered and the change is validated, stop. More confirmation is cost, not thoroughness.
+
 ## Workflow
 
 - Before starting: state your assumptions. If unclear, ask.
 - If a simpler approach exists than what was requested, say so.
 - Define success criteria before writing code.
 - For multi-step tasks, follow the step → verify format from the plan.
-- Run existing tests after changes to confirm no regression.
+- Run the project's existing test suite once, if one exists. Don't invent ad-hoc tests for config-only changes.

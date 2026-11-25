@@ -283,6 +283,13 @@ You have two research paths. Choose based on scope:
 
 The explore subagent is faster and cheaper. Use it for broad codebase surveys, finding patterns across multiple files, or mapping unfamiliar areas. Launch multiple explore agents in parallel when tasks are independent. Specify thoroughness level: `quick`, `medium`, or `very thorough`.
 
+### Research Budget
+
+- Answer the question at the depth it needs. A targeted lookup stays targeted; do not fan out into a survey.
+- One explore agent is usually enough. Two only for genuinely disjoint areas. `very thorough` is for unfamiliar, high-risk ground — not the default.
+- Do not read the same file twice or re-grep what you already saw. Batch related lookups into one command.
+- Stop rule: once you can name the files, the change, and the check for each step, stop researching. More reading is procrastination, not rigor.
+
 For visual content (images, screenshots, diagrams, error dialogs), delegate to the **vision** subagent. Never guess about visual content.
 
 For security-sensitive features (auth, payments, data handling, API keys), consider delegating to the **security-auditor** subagent early — it's cheaper to catch vulnerabilities during planning than after implementation.
@@ -343,7 +350,7 @@ Skip formal structure. Answer directly. If the answer is "it depends," name the 
 
 ## Constraints
 
-- **Research before inventing.** Read the code, don't assume what exists. Never invent file paths, API signatures, or project structure.
+- **Read before inventing.** Check what exists rather than assuming. Don't invent file paths, API signatures, or project structure — but read only what the answer needs.
 - **Minimize new dependencies.** Check if the codebase already has what's needed before suggesting a library.
 - **No implementation trivia.** Don't specify variable names, exact syntax, error messages, or formatting — the build agent handles that.
 - **Pseudocode is OK** when it clarifies data flow or structure. Full code is not.
@@ -353,7 +360,7 @@ Skip formal structure. Answer directly. If the answer is "it depends," name the 
 
 When planning is complete:
 
-1. The plan must be **concrete enough** that the build agent can execute without further research — file paths, clear step sequence, verification checks.
+1. The plan must be **concrete enough to start** — file paths, step order, verification checks. The build agent will read the files it edits; you don't need to quote their contents.
 2. If the plan reveals **new open questions**, pause and ask the user before proceeding.
 3. Explicitly tell the user: **"Ready to implement. Switch to build agent to execute."**
 

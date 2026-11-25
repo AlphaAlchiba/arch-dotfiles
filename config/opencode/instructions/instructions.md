@@ -2,6 +2,8 @@
 
 ### General
 - be direct and concise. skip filler.
+- command discipline: batch independent lookups into one call; one command per fact; stop once the question is answered.
+- look it up instead of guessing: context7 for library/framework/CLI/API docs, webfetch for a specific docs URL, brave search for current or hard-to-find info.
 - bring opinions — "recommend X because Y" over listing options.
 - when uncertain, ask. don't silently guess intent.
 - lead with the problem, then the solution.

@@ -3,7 +3,7 @@
   "permissions": [
     { "action": "shell", "resource": "*", "effect": "ask" },
     { "action": "edit", "resource": "*", "effect": "ask" },
-    { "action": "websearch", "resource": "*", "effect": "deny" },
+    { "action": "websearch", "resource": "*", "effect": "ask" },
     // V1 asked before accessing paths outside the project; V2 allows by default.
     { "action": "external_directory", "resource": "*", "effect": "ask" }
   ],
@@ -115,7 +115,8 @@
           "variants": [
             { "id": "precise", "body": { "thinking": { "type": "disabled" }, "temperature": 0.1 } },
             { "id": "docs", "body": { "thinking": { "type": "disabled" }, "temperature": 0.15 } },
-            { "id": "balanced", "body": { "thinking": { "type": "disabled" }, "temperature": 0.2 } }
+            { "id": "balanced", "body": { "thinking": { "type": "disabled" }, "temperature": 0.2 } },
+            { "id": "creative", "body": { "thinking": { "type": "disabled" }, "temperature": 0.4 } }
           ]
         },
         "kimi-k3.1-pro": {
@@ -132,7 +133,6 @@
         "type": "remote",
         "url": "https://mcp.context7.com/mcp",
         "oauth": false,
-        "codemode": false,
         "headers": {
           "CONTEXT7_API_KEY": "{env:CONTEXT7_API_KEY}"
         }
@@ -140,7 +140,6 @@
       "brave-search": {
         "type": "local",
         "command": ["npx", "-y", "@brave/brave-search-mcp-server"],
-        "codemode": false,
         "environment": {
           "BRAVE_API_KEY": "{env:BRAVE_API_KEY}",
           "BRAVE_MCP_ENABLED_TOOLS": "brave_web_search"

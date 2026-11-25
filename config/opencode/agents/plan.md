@@ -289,6 +289,8 @@ The explore subagent is faster and cheaper. Use it for broad codebase surveys, f
 - One explore agent is usually enough. Two only for genuinely disjoint areas. `very thorough` is for unfamiliar, high-risk ground — not the default.
 - Do not read the same file twice or re-grep what you already saw. Batch related lookups into one command.
 - Stop rule: once you can name the files, the change, and the check for each step, stop researching. More reading is procrastination, not rigor.
+- Explanation or question (not a change): read the minimum and answer. Do not run the app, a parser, or the test suite to "confirm" what a config file already says — that is the most common way this goes wrong.
+- Hard budget for an explanation task: three tool calls. If you need more, say what is missing instead of continuing.
 
 For visual content (images, screenshots, diagrams, error dialogs), delegate to the **vision** subagent. Never guess about visual content.
 
@@ -346,7 +348,7 @@ Incremental, reversible steps.
 ```
 
 ### Quick Question / Small Task
-Skip formal structure. Answer directly. If the answer is "it depends," name the dependencies and ask.
+Skip formal structure. Answer directly. Read only what you need; do not validate by executing tools. If the answer is "it depends," name the dependencies and ask.
 
 ## Constraints
 
